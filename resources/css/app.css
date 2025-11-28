@@ -1,0 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap")
+layer(base);
+
+@import "tailwindcss";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+
+@import "basecoat-css";
+@layer base {
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply !outline-none !ring-0 !ring-offset-0 !shadow-none;
+  }
+}
