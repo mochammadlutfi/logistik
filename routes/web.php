@@ -10,7 +10,7 @@ use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\PemeliharaanBarangController;
 use App\Http\Controllers\DashboardController;
-
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -35,5 +35,20 @@ Route::middleware('auth')->group(function () {
     Route::resource('barang-keluar', BarangKeluarController::class);
     Route::resource('pemeliharaan-barang', PemeliharaanBarangController::class);
 });
+
+// Clear cache and generate key routes
+Route::get('/clear-cache', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    return redirect()->back()->with('status', 'Cache cleared successfully.');
+})->name('clear.cache');
+
+Route::get('/generate-key', function () {
+    Artisan::call('key:generate');
+    return redirect()->back()->with('status', 'Application key generated successfully.');
+})->name('generate.key');
+
 
 require __DIR__.'/auth.php';
