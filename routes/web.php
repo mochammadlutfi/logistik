@@ -22,6 +22,20 @@ use Illuminate\Support\Facades\Route;
 // })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
+// Clear cache and generate key routes
+Route::get('/clear-cache', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    echo 'Cache cleared successfully.';
+})->name('clear.cache');
+
+Route::get('/generate-key', function () {
+    Artisan::call('key:generate');
+    echo 'Application key generated successfully.';
+})->name('generate.key');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -36,19 +50,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('pemeliharaan-barang', PemeliharaanBarangController::class);
 });
 
-// Clear cache and generate key routes
-Route::get('/clear-cache', function () {
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('route:clear');
-    Artisan::call('view:clear');
-    return redirect()->back()->with('status', 'Cache cleared successfully.');
-})->name('clear.cache');
-
-Route::get('/generate-key', function () {
-    Artisan::call('key:generate');
-    return redirect()->back()->with('status', 'Application key generated successfully.');
-})->name('generate.key');
 
 
 require __DIR__.'/auth.php';
