@@ -1,0 +1,118 @@
+@startuml UseCase_Sistem_Inventory_Logistik
+
+title Use Case Diagram - Sistem Inventory Logistik
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor<<Master>> #E8F5E9
+    BackgroundColor<<Transaksi>> #E3F2FD
+    BackgroundColor<<Laporan>> #FFF3E0
+    BackgroundColor<<Approval>> #FCE4EC
+    BackgroundColor<<Auth>> #F3E5F5
+}
+
+' === ACTORS ===
+actor "Admin" as Admin #3F51B5
+actor "Kabag Logistik" as Kabag #4CAF50
+actor "Staff Gudang" as Staff #FF9800
+
+' === USE CASES ===
+
+rectangle "Sistem Inventory Logistik" {
+    
+    ' --- Autentikasi ---
+    package "Autentikasi" {
+        usecase "Login" as UC_Login <<Auth>>
+        usecase "Logout" as UC_Logout <<Auth>>
+        usecase "Lihat Dashboard" as UC_Dashboard <<Auth>>
+    }
+    
+    ' --- Master Data ---
+    package "Master Data" {
+        usecase "Kelola Data Barang" as UC_Barang <<Master>>
+        usecase "Kelola Kategori Barang" as UC_Kategori <<Master>>
+        usecase "Kelola Satuan" as UC_Satuan <<Master>>
+        usecase "Kelola Supplier" as UC_Supplier <<Master>>
+        usecase "Kelola User" as UC_User <<Master>>
+    }
+    
+    ' --- Transaksi ---
+    package "Transaksi" {
+        usecase "Catat Barang Masuk" as UC_BarangMasuk <<Transaksi>>
+        usecase "Catat Barang Keluar" as UC_BarangKeluar <<Transaksi>>
+        usecase "Ajukan Permintaan Barang" as UC_AjukanPermintaan <<Transaksi>>
+        usecase "Lihat Stok Barang" as UC_LihatStok <<Transaksi>>
+        usecase "Catat Pemeliharaan Barang" as UC_Pemeliharaan <<Transaksi>>
+    }
+    
+    ' --- Persetujuan ---
+    package "Persetujuan" {
+        usecase "Setujui Permintaan Barang" as UC_ApprovePermintaan <<Approval>>
+        usecase "Tolak Permintaan Barang" as UC_RejectPermintaan <<Approval>>
+    }
+    
+    ' --- Laporan ---
+    package "Laporan & Verifikasi" {
+        usecase "Buat Laporan" as UC_BuatLaporan <<Laporan>>
+        usecase "Lihat Laporan" as UC_LihatLaporan <<Laporan>>
+        usecase "Verifikasi Laporan" as UC_VerifikasiLaporan <<Laporan>>
+        usecase "Download Laporan" as UC_DownloadLaporan <<Laporan>>
+    }
+}
+
+' === RELATIONSHIPS ===
+
+' Admin - Full Access
+Admin --> UC_Login
+Admin --> UC_Logout
+Admin --> UC_Dashboard
+Admin --> UC_Barang
+Admin --> UC_Kategori
+Admin --> UC_Satuan
+Admin --> UC_Supplier
+Admin --> UC_User
+Admin --> UC_BarangMasuk
+Admin --> UC_BarangKeluar
+Admin --> UC_LihatStok
+Admin --> UC_Pemeliharaan
+Admin --> UC_AjukanPermintaan
+Admin --> UC_ApprovePermintaan
+Admin --> UC_RejectPermintaan
+Admin --> UC_BuatLaporan
+Admin --> UC_LihatLaporan
+Admin --> UC_VerifikasiLaporan
+Admin --> UC_DownloadLaporan
+
+' Kabag Logistik - Approval & Verification Access
+Kabag --> UC_Login
+Kabag --> UC_Logout
+Kabag --> UC_Dashboard
+Kabag --> UC_LihatStok
+Kabag --> UC_ApprovePermintaan
+Kabag --> UC_RejectPermintaan
+Kabag --> UC_LihatLaporan
+Kabag --> UC_VerifikasiLaporan
+Kabag --> UC_DownloadLaporan
+
+' Staff Gudang - Operational Access
+Staff --> UC_Login
+Staff --> UC_Logout
+Staff --> UC_Dashboard
+Staff --> UC_BarangMasuk
+Staff --> UC_BarangKeluar
+Staff --> UC_LihatStok
+Staff --> UC_AjukanPermintaan
+Staff --> UC_Pemeliharaan
+Staff --> UC_BuatLaporan
+Staff --> UC_LihatLaporan
+
+' === INCLUDES & EXTENDS ===
+
+UC_BarangMasuk ..> UC_LihatStok : <<include>>
+UC_BarangKeluar ..> UC_LihatStok : <<include>>
+UC_ApprovePermintaan ..> UC_BarangKeluar : <<extend>>
+UC_Pemeliharaan ..> UC_Barang : <<include>>
+
+@enduml

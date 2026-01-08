@@ -10,7 +10,7 @@
             <div class="mb-4 rounded border border-green-200 bg-green-50 text-green-700 px-3 py-2 text-sm">{{ session('status') }}</div>
         @endif
 
-        <div class="overflow-hidden rounded-lg border p-4">
+        <div class="rounded-lg border p-4">
 
             <section>
                 <form method="POST" action="{{ $isEdit ? route('barang-masuk.update', $item->id) : route('barang-masuk.store') }}" class="form grid gap-4">
@@ -37,7 +37,7 @@
                                     <path d="m7 9 5-5 5 5" />
                                     </svg>
                                 </button>
-                                <div id="select-supplier-popover" data-popover aria-hidden="true">
+                                <div id="select-supplier-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
                                     <header>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
                                         <circle cx="11" cy="11" r="8" />
@@ -46,7 +46,7 @@
                                     <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-supplier-listbox" aria-labelledby="select-supplier-trigger" />
                                     </header>
 
-                                    <div role="listbox" id="select-supplier-listbox" aria-orientation="vertical" aria-labelledby="select-supplier-trigger">
+                                    <div role="listbox" id="select-supplier-listbox" aria-orientation="vertical" aria-labelledby="select-supplier-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
                                     <div role="group" aria-labelledby="group-label-select-supplier-items-1">
                                         <div role="heading" id="group-label-select-supplier-items-1">Supplier</div>
 
@@ -101,7 +101,7 @@
                                                         <path d="m7 9 5-5 5 5" />
                                                         </svg>
                                                     </button>
-                                                    <div id="select-barang-0-popover" data-popover aria-hidden="true">
+                                                    <div id="select-barang-0-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
                                                         <header>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
                                                             <circle cx="11" cy="11" r="8" />
@@ -110,13 +110,14 @@
                                                         <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-barang-0-listbox" aria-labelledby="select-barang-0-trigger" />
                                                         </header>
 
-                                                        <div role="listbox" id="select-barang-0-listbox" aria-orientation="vertical" aria-labelledby="select-barang-0-trigger">
+                                                        <div role="listbox" id="select-barang-0-listbox" aria-orientation="vertical" aria-labelledby="select-barang-0-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
                                                         <div role="group" aria-labelledby="group-label-select-barang-0">
                                                             <div role="heading" id="group-label-select-barang-0">Barang</div>
 
-                                                            @foreach ($barang as $k)
-                                                            <div id="select-barang-0" role="option" data-value="{{ $k->id }}" {{ old('detail['.$k.'][barang_id]') == $k->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $k->nama_kategori }}">
-                                                                {{ $k->nama_barang }}
+                                                            @foreach ($barang as $b)
+                                                            <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" {{ old('detail['.$k.'][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
+                                                                {{ $b->nama_barang }}
+                                                                <span class="badge badge-secondary">{{ $b->satuan->nama_satuan }}</span>
                                                             </div>
                                                             @endforeach
                                                         </div>
@@ -151,7 +152,7 @@
                                                 <path d="m7 9 5-5 5 5" />
                                                 </svg>
                                             </button>
-                                            <div id="select-barang-0-popover" data-popover aria-hidden="true">
+                                            <div id="select-barang-0-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
                                                 <header>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
                                                     <circle cx="11" cy="11" r="8" />
@@ -160,13 +161,14 @@
                                                 <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-barang-0-listbox" aria-labelledby="select-barang-0-trigger" />
                                                 </header>
 
-                                                <div role="listbox" id="select-barang-0-listbox" aria-orientation="vertical" aria-labelledby="select-barang-0-trigger">
+                                                <div role="listbox" id="select-barang-0-listbox" aria-orientation="vertical" aria-labelledby="select-barang-0-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
                                                 <div role="group" aria-labelledby="group-label-select-barang-0">
                                                     <div role="heading" id="group-label-select-barang-0">Barang</div>
 
-                                                    @foreach ($barang as $k)
-                                                    <div id="select-barang-0" role="option" data-value="{{ $k->id }}" {{ old('detail[0][barang_id]') == $k->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $k->nama_kategori }}">
-                                                        {{ $k->nama_barang }}
+                                                    @foreach ($barang as $b)
+                                                    <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" {{ old('detail[0][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
+                                                        {{ $b->nama_barang }}
+                                                        <span class="text-xs text-muted-foreground">{{ $b->satuan->nama_satuan }}</span>
                                                     </div>
                                                     @endforeach
                                                 </div>
@@ -223,50 +225,102 @@
     
     @push('scripts')
     <script>
+        // Custom select handler yang bekerja dengan row dinamis
+        // BasecoatUI CSS tetap digunakan, JavaScript custom untuk handle interaksi
+        
         document.addEventListener('click', function (e) {
             const trigger = e.target.closest('[id$="-trigger"]');
             if (trigger && trigger.closest('.select')) {
                 e.preventDefault();
+                e.stopPropagation();
                 const container = trigger.closest('.select');
                 const popover = container.querySelector('[id$="-popover"]');
                 const isHidden = popover && popover.getAttribute('aria-hidden') !== 'false';
-                document.querySelectorAll('[data-popover]').forEach(p => p.setAttribute('aria-hidden', 'true'));
-                if (popover) popover.setAttribute('aria-hidden', isHidden ? 'false' : 'true');
+                
+                // Close all other popovers first
+                document.querySelectorAll('.select [data-popover]').forEach(p => {
+                    if (p !== popover) {
+                        p.setAttribute('aria-hidden', 'true');
+                    }
+                });
+                
+                if (popover) {
+                    popover.setAttribute('aria-hidden', isHidden ? 'false' : 'true');
+                    // Focus on search input when opened
+                    if (isHidden) {
+                        const searchInput = popover.querySelector('input[role="combobox"]');
+                        if (searchInput) {
+                            setTimeout(() => searchInput.focus(), 50);
+                        }
+                    }
+                }
                 return;
             }
 
             const option = e.target.closest('[role="option"]');
             if (option && option.closest('.select')) {
+                e.preventDefault();
                 const container = option.closest('.select');
                 const labelSpan = container.querySelector('.truncate');
-                const hiddenInput = container.parentElement.querySelector('input[type="hidden"]');
+                const hiddenInput = container.querySelector('input[type="hidden"]');
+                
                 if (labelSpan) labelSpan.textContent = option.textContent.trim();
                 if (hiddenInput) hiddenInput.value = option.dataset.value || '';
-                option.parentElement.querySelectorAll('[role="option"][aria-selected="true"]').forEach(el => el.removeAttribute('aria-selected'));
+                
+                // Update aria-selected
+                container.querySelectorAll('[role="option"][aria-selected="true"]').forEach(el => el.removeAttribute('aria-selected'));
                 option.setAttribute('aria-selected', 'true');
+                
+                // Close popover
                 const popover = container.querySelector('[id$="-popover"]');
                 if (popover) popover.setAttribute('aria-hidden', 'true');
+                
+                // Clear search input
+                const searchInput = popover?.querySelector('input[role="combobox"]');
+                if (searchInput) {
+                    searchInput.value = '';
+                    // Show all options again
+                    const listbox = container.querySelector('[role="listbox"]');
+                    if (listbox) {
+                        listbox.querySelectorAll('[role="option"]').forEach(opt => {
+                            opt.style.display = '';
+                        });
+                    }
+                }
                 return;
             }
 
-            const insideSelect = e.target.closest('.select');
-            if (!insideSelect) {
-                document.querySelectorAll('[data-popover]').forEach(p => p.setAttribute('aria-hidden', 'true'));
+            // Close all popovers when clicking outside
+            if (!e.target.closest('.select')) {
+                document.querySelectorAll('.select [data-popover]').forEach(p => p.setAttribute('aria-hidden', 'true'));
             }
         });
 
+        // Search functionality
         document.addEventListener('input', function (e) {
             const input = e.target.closest('input[role="combobox"]');
             if (!input) return;
-            const listId = input.getAttribute('aria-controls');
-            const list = listId ? document.getElementById(listId) : null;
-            if (!list) return;
-            const q = input.value.toLowerCase();
-            list.querySelectorAll('[role="option"]').forEach(opt => {
+            
+            const container = input.closest('.select');
+            if (!container) return;
+            
+            const listbox = container.querySelector('[role="listbox"]');
+            if (!listbox) return;
+            
+            const q = input.value.toLowerCase().trim();
+            listbox.querySelectorAll('[role="option"]').forEach(opt => {
                 const text = opt.textContent.toLowerCase();
                 const keywords = (opt.dataset.keywords || '').toLowerCase();
-                opt.style.display = (q === '' || text.includes(q) || keywords.includes(q)) ? '' : 'none';
+                const match = q === '' || text.includes(q) || keywords.includes(q);
+                opt.style.display = match ? '' : 'none';
             });
+        });
+
+        // Keyboard navigation (escape to close)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.select [data-popover]').forEach(p => p.setAttribute('aria-hidden', 'true'));
+            }
         });
 
         function reindexRows() {

@@ -1,0 +1,165 @@
+@startuml UseCase_Aplikasi_Inventaris_Gudang_V2
+
+title Use Case Diagram - Aplikasi Inventaris Gudang
+caption Sistem Manajemen Inventaris dengan Tracking Barang
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam handwritten false
+
+skinparam usecase {
+    BackgroundColor<<Master>> #E8F5E9
+    BackgroundColor<<Stok>> #E3F2FD
+    BackgroundColor<<Permintaan>> #FFF3E0
+    BackgroundColor<<Pemeliharaan>> #FCE4EC
+    BackgroundColor<<Auth>> #F3E5F5
+    BackgroundColor<<Laporan>> #FFFDE7
+    BackgroundColor<<Tracking>> #E0F7FA
+}
+
+' === ACTORS ===
+actor "Admin Gudang" as AdminGudang #2196F3
+actor "Admin Lapangan" as AdminLapangan #4CAF50
+actor "Kabag" as Kabag #FF9800
+actor "Audit" as Audit #9C27B0
+
+' === USE CASES ===
+
+rectangle "Aplikasi Inventaris Gudang" {
+    
+    ' --- Autentikasi ---
+    package "Autentikasi" {
+        usecase "Login" as UC_Login <<Auth>>
+        usecase "Logout" as UC_Logout <<Auth>>
+        usecase "Lihat Dashboard" as UC_Dashboard <<Auth>>
+    }
+    
+    ' --- Master Data ---
+    package "Master Data" {
+        usecase "Kelola Produk/Equipment" as UC_Produk <<Master>>
+        usecase "Kelola Lokasi Gudang" as UC_Lokasi <<Master>>
+        usecase "Kelola Kategori Barang" as UC_Kategori <<Master>>
+        usecase "Kelola Jenis Barang\n(Habis Pakai/Tidak Habis Pakai)" as UC_JenisBarang <<Master>>
+    }
+    
+    ' --- Manajemen Stok ---
+    package "Manajemen Stok" {
+        usecase "Pengisian Stock\nBarang Baru" as UC_StokBaru <<Stok>>
+        usecase "Kirim Barang ke\nAdmin Lapangan" as UC_Kirim <<Stok>>
+        usecase "Lihat Stok Barang" as UC_LihatStok <<Stok>>
+    }
+    
+    ' --- Permintaan Barang ---
+    package "Permintaan Barang" {
+        usecase "Ajukan Permintaan\nBarang" as UC_AjukanPermintaan <<Permintaan>>
+        usecase "Otorisasi Permintaan\nBarang" as UC_OtorisasiPermintaan <<Permintaan>>
+        usecase "Lihat Status\nPermintaan" as UC_StatusPermintaan <<Permintaan>>
+    }
+    
+    ' --- Pengembalian & Pemeliharaan ---
+    package "Pengembalian & Pemeliharaan" {
+        usecase "Pengembalian Barang\nke Gudang" as UC_Pengembalian <<Pemeliharaan>>
+        usecase "Ajukan Pemeliharaan\nBarang Rusak" as UC_AjukanPemeliharaan <<Pemeliharaan>>
+        usecase "Otorisasi\nPemeliharaan" as UC_OtorisasiPemeliharaan <<Pemeliharaan>>
+        usecase "Proses Pemeliharaan/\nPerbaikan Barang" as UC_ProsesPemeliharaan <<Pemeliharaan>>
+    }
+    
+    ' --- Tracking Barang (Non-Habis Pakai) ---
+    package "Tracking Barang\n(Tidak Habis Pakai)" {
+        usecase "Tracking Penggunaan\nBarang" as UC_Tracking <<Tracking>>
+        usecase "Lihat Riwayat\nPenggunaan Barang" as UC_RiwayatPenggunaan <<Tracking>>
+        usecase "Lihat Lokasi Barang\nSaat Ini" as UC_LokasiBarang <<Tracking>>
+    }
+    
+    ' --- Laporan ---
+    package "Laporan & Audit" {
+        usecase "Lihat Transaksi" as UC_LihatTransaksi <<Laporan>>
+        usecase "Tarik Laporan\nTransaksi" as UC_TarikLaporan <<Laporan>>
+        usecase "Export Laporan" as UC_ExportLaporan <<Laporan>>
+    }
+}
+
+' === ACTOR RELATIONSHIPS ===
+
+' --- Admin Gudang ---
+AdminGudang --> UC_Login
+AdminGudang --> UC_Logout
+AdminGudang --> UC_Dashboard
+AdminGudang --> UC_Produk
+AdminGudang --> UC_Lokasi
+AdminGudang --> UC_Kategori
+AdminGudang --> UC_JenisBarang
+AdminGudang --> UC_StokBaru
+AdminGudang --> UC_Kirim
+AdminGudang --> UC_LihatStok
+AdminGudang --> UC_StatusPermintaan
+AdminGudang --> UC_AjukanPemeliharaan
+AdminGudang --> UC_ProsesPemeliharaan
+AdminGudang --> UC_Tracking
+AdminGudang --> UC_RiwayatPenggunaan
+AdminGudang --> UC_LokasiBarang
+AdminGudang --> UC_LihatTransaksi
+
+' --- Admin Lapangan ---
+AdminLapangan --> UC_Login
+AdminLapangan --> UC_Logout
+AdminLapangan --> UC_Dashboard
+AdminLapangan --> UC_AjukanPermintaan
+AdminLapangan --> UC_StatusPermintaan
+AdminLapangan --> UC_Pengembalian
+AdminLapangan --> UC_LihatStok
+AdminLapangan --> UC_RiwayatPenggunaan
+AdminLapangan --> UC_LokasiBarang
+
+' --- Kabag ---
+Kabag --> UC_Login
+Kabag --> UC_Logout
+Kabag --> UC_Dashboard
+Kabag --> UC_OtorisasiPermintaan
+Kabag --> UC_OtorisasiPemeliharaan
+Kabag --> UC_LihatStok
+Kabag --> UC_StatusPermintaan
+Kabag --> UC_LihatTransaksi
+Kabag --> UC_TarikLaporan
+Kabag --> UC_RiwayatPenggunaan
+
+' --- Audit ---
+Audit --> UC_Login
+Audit --> UC_Logout
+Audit --> UC_Dashboard
+Audit --> UC_LihatTransaksi
+Audit --> UC_TarikLaporan
+Audit --> UC_ExportLaporan
+Audit --> UC_RiwayatPenggunaan
+
+' === INCLUDE & EXTEND RELATIONSHIPS ===
+
+UC_Kirim ..> UC_OtorisasiPermintaan : <<include>>
+UC_ProsesPemeliharaan ..> UC_OtorisasiPemeliharaan : <<include>>
+UC_Pengembalian ..> UC_Tracking : <<extend>>
+UC_AjukanPermintaan ..> UC_LihatStok : <<include>>
+UC_Tracking ..> UC_LokasiBarang : <<include>>
+
+' === NOTES ===
+note right of UC_JenisBarang
+  **Jenis Barang:**
+  - Habis Pakai (Consumable)
+  - Tidak Habis Pakai (Equipment)
+  
+  **Barang Tidak Habis Pakai:**
+  - Dapat diperbaiki
+  - Dapat di-tracking
+  - Memiliki riwayat penggunaan
+end note
+
+note right of UC_Tracking
+  Tracking mencatat:
+  - Siapa yang menggunakan
+  - Kapan digunakan
+  - Lokasi penggunaan
+  - Kondisi barang
+end note
+
+@enduml
