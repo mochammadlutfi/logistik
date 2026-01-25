@@ -2,7 +2,7 @@
     <div class="p-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between gap-2 mb-6">
             <h1 class="text-xl font-semibold">
-                Detail Barang Masuk
+                Detail Barang Keluar
             </h1>
         </div>
 

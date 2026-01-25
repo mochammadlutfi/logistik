@@ -9,7 +9,9 @@ use App\Http\Controllers\PermintaanBarangController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\PemeliharaanBarangController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -44,10 +46,23 @@ Route::middleware('auth')->group(function () {
     Route::resource('satuan', SatuanController::class)->only(['index','store','update','destroy']);
     Route::resource('supplier', SupplierController::class);
     Route::resource('barang', BarangController::class);
+    Route::resource('user', UserController::class);
     Route::resource('permintaan-barang', PermintaanBarangController::class);
+    Route::put('permintaan-barang/{id}/status', [PermintaanBarangController::class, 'status'])->name('permintaan-barang.status');
+    Route::get('permintaan-barang/{id}/detail', [PermintaanBarangController::class, 'getDetail'])->name('permintaan-barang.detail');
     Route::resource('barang-masuk', BarangMasukController::class);
     Route::resource('barang-keluar', BarangKeluarController::class);
     Route::resource('pemeliharaan-barang', PemeliharaanBarangController::class);
+
+    // Laporan Routes
+    Route::prefix('laporan')->name('laporan.')->group(function () {
+        Route::get('/', [LaporanController::class, 'index'])->name('index');
+        Route::get('/stok-barang', [LaporanController::class, 'stokBarang'])->name('stok-barang');
+        Route::get('/barang-masuk', [LaporanController::class, 'barangMasuk'])->name('barang-masuk');
+        Route::get('/barang-keluar', [LaporanController::class, 'barangKeluar'])->name('barang-keluar');
+        Route::get('/permintaan-barang', [LaporanController::class, 'permintaanBarang'])->name('permintaan-barang');
+        Route::get('/pemeliharaan-barang', [LaporanController::class, 'pemeliharaanBarang'])->name('pemeliharaan-barang');
+    });
 });
 
 

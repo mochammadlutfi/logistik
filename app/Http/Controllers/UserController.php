@@ -20,8 +20,9 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'string', 'email', 'max:100'],
-            'password' => ['required', 'string'],
+            'email' => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')],
+            'role' => ['required', 'string', 'max:150'],
+            'password' => ['required', 'string', 'min:8', 'max:255', 'confirmed'],
         ]);
 
         if (!array_key_exists('is_active', $validated)) {
@@ -29,24 +30,29 @@ class UserController extends Controller
         }
 
         User::create($validated);
-        return redirect()->route('user')->with('status', 'User berhasil dibuat');
+        return redirect()->route('user.index')->with('status', 'User berhasil dibuat');
     }
 
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'string', 'email', 'max:100'],
-            'password' => ['required', 'string'],
+            'email' => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')->ignore($user->id)],
+            'role' => ['required', 'string', 'max:150'],
+            'password' => ['nullable', 'string', 'min:8', 'max:255', 'confirmed'],
         ]);
 
+        if (empty($validated['password'])) {
+            unset($validated['password']);
+        }
+
         $user->update($validated);
-        return redirect()->route('user')->with('status', 'User berhasil diperbarui');
+        return redirect()->route('user.index')->with('status', 'User berhasil diperbarui');
     }
 
-    public function destroy(Supplier $supplier)
+    public function destroy(User $user)
     {
-        $supplier->delete();
-        return redirect()->route('supplier.index')->with('status', 'Supplier berhasil dihapus');
+        $user->delete();
+        return redirect()->route('user.index')->with('status', 'User berhasil dihapus');
     }
 }

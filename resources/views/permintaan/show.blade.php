@@ -2,8 +2,82 @@
     <div class="p-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between gap-2 mb-6">
             <h1 class="text-xl font-semibold">
-                Detail Barang Masuk
+                Detail Permintaan Barang
             </h1>
+
+            @if ($item->status == 'diajukan' && in_array(auth()->user()->role, ['Admin', 'Kabag Logistik']))
+            <div class="flex gap-2">
+                <button type="button" onclick="document.getElementById('permintaan_setujui').showModal()" class="btn btn-primary">
+                <i class="fa-solid fa-check"></i>
+                    Setuju
+                </button>
+                <button type="button" onclick="document.getElementById('permintaan_tolak').showModal()" class="btn btn-destructive">
+                <i class="fa-solid fa-xmark"></i>
+                Tolak
+                </button>
+
+                <dialog id="permintaan_tolak" class="dialog w-full sm:max-w-[425px] max-h-[612px]" aria-labelledby="permintaan_tolak-title" aria-describedby="permintaan_tolak-description" onclick="if (event.target === this) this.close()">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                                <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-bold">Perhatian!</p>
+                                <p class="text-sm text-gray-500 mt-1">Apakah Anda yakin ingin menolak permintaan ini?</p>
+                            </div>
+                        </div>
+
+                        <form action="{{ route('permintaan-barang.status', $item->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="status" value="ditolak">
+                            <div class="mb-2">
+                                <label for="permintaan_tolak-alasan">Alasan</label>
+                                <textarea class="textarea" id="permintaan_tolak-alasan" name="alasan"></textarea>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Batal</button>
+                                <button type="submit" class="btn">Tolak</button>
+                            </div>
+                        </form>
+                    </div>
+                </dialog>
+
+                <dialog id="permintaan_setujui" class="dialog w-full sm:max-w-[425px] max-h-[612px]" aria-labelledby="permintaan_setujui-title" aria-describedby="permintaan_setujui-description" onclick="if (event.target === this) this.close()">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                                <i class="fa-solid fa-check text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-bold">Perhatian!</p>
+                                <p class="text-sm text-gray-500 mt-1">Apakah Anda yakin ingin menyetujui permintaan ini?</p>
+                            </div>
+                        </div>
+
+                        <form action="{{ route('permintaan-barang.status', $item->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="status" value="disetujui">
+                            <div class="mb-2">
+                                <label for="permintaan_setujui-alasan">Alasan</label>
+                                <textarea class="textarea" id="permintaan_setujui-alasan" name="alasan"></textarea>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Batal</button>
+                                <button type="submit" class="btn">Setujui</button>
+                            </div>
+                        </form>
+                    </div>
+                </dialog>
+            </div>
+            @endif
+
         </div>
 
         @if (session('status'))
@@ -18,17 +92,38 @@
                         {{ $item->kode }}
                     </p>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                     <div class="space-y-1">
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tanggal</p>
-                        <p class="text-base font-semibold text-gray-900">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y')  }}</p>
+                        <p class="text-base font-semibold text-gray-900">{{ \Carbon\Carbon::parse($item->tanggal)->format('d F Y')  }}</p>
                     </div>
 
+                    <div class="space-y-1">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Status</p>
+                        @if($item->status == 'disetujui')
+                            <span class="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">Disetujui</span>
+                        @elseif($item->status == 'ditolak')
+                            <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">Ditolak</span>
+                        @elseif($item->status == 'selesai')
+                            <span class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">Selesai</span>
+                        @elseif($item->status == 'diajukan')
+                            <span class="bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Diajukan</span>
+                        @endif
+                    </div>
                     <div class="space-y-1">
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Alasan</p>
                         <p class="text-base font-semibold text-gray-900">{{ $item->alasan ?? '-' }}</p>
                     </div>
-                    
+                    @if($item->tanggal_approval)
+                    <div class="space-y-1">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tanggal Approval</p>
+                        <p class="text-base font-semibold text-gray-900">{{ \Carbon\Carbon::parse($item->tanggal_approval)->format('d F Y') ?? '-' }}</p>
+                    </div>
+                    @endif
+                    <div class="space-y-1">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Keterangan {{ in_array($item->status, ['disetujui', 'selesai']) ? 'Disetujui' : 'Ditolak' }}</p>
+                        <p class="text-base font-semibold text-gray-900">{{ $item->catatan_approval ?? '-' }}</p>
+                    </div>
                 </div>
 
 

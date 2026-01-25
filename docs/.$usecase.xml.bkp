@@ -1,0 +1,216 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Use Case Diagram - Fixed">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- System Boundary -->
+        <mxCell id="system_boundary" value="Sistem Informasi Monitoring Logistik dan Alat Produksi Berbasis Web di PT Timah Tbk" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="200" y="40" width="800" height="720" as="geometry" />
+        </mxCell>
+        
+        <!-- Actors -->
+        <!-- Staf Gudang Logistik -->
+        <mxCell id="actor_staf_gudang" value="Staf Gudang&lt;br&gt;Logistik" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="150" width="60" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Gudang Logistik -->
+        <mxCell id="actor_gudang" value="Gudang&lt;br&gt;Logistik" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="330" width="60" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Kabag Logistik -->
+        <mxCell id="actor_kabag" value="Kabag&lt;br&gt;Logistik" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="510" width="60" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin -->
+        <mxCell id="actor_admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="350" width="60" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Use Cases -->
+        <!-- Login -->
+        <mxCell id="uc_login" value="Login" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="80" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Logout -->
+        <mxCell id="uc_logout" value="Logout" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="670" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Barang Masuk -->
+        <mxCell id="uc_barang_masuk" value="Kelola Barang Masuk" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="180" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Barang Keluar -->
+        <mxCell id="uc_barang_keluar" value="Kelola Barang Keluar" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="360" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Permintaan Barang -->
+        <mxCell id="uc_permintaan" value="Permintaan Barang" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="280" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Pemeliharaan Barang -->
+        <mxCell id="uc_pemeliharaan" value="Pemeliharaan Barang" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="380" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Verifikasi Permintaan -->
+        <mxCell id="uc_verifikasi" value="Verifikasi Permintaan" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="540" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Lihat Laporan -->
+        <mxCell id="uc_laporan" value="Lihat Laporan" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="540" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola User -->
+        <mxCell id="uc_kelola_user" value="Kelola User" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="280" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Master Data -->
+        <mxCell id="uc_master_data" value="Kelola Master Data" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="380" width="140" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Associations from Actors to Use Cases -->
+        
+        <!-- Staf Gudang Logistik -->
+        <mxCell id="assoc_staf_barang_masuk" value="" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_staf_gudang" target="uc_barang_masuk">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_staf_permintaan" value="" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_staf_gudang" target="uc_permintaan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_staf_pemeliharaan" value="" style="endArrow=none;html=1;exitX=1;exitY=0.7;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_staf_gudang" target="uc_pemeliharaan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_staf_logout" value="" style="endArrow=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_staf_gudang" target="uc_logout">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Gudang Logistik -->
+        <mxCell id="assoc_gudang_barang_keluar" value="" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_gudang" target="uc_barang_keluar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_gudang_pemeliharaan" value="" style="endArrow=none;html=1;exitX=1;exitY=0.7;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_gudang" target="uc_pemeliharaan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_gudang_logout" value="" style="endArrow=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_gudang" target="uc_logout">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kabag Logistik -->
+        <mxCell id="assoc_kabag_verifikasi" value="" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_kabag" target="uc_verifikasi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_kabag_laporan" value="" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_kabag" target="uc_laporan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_kabag_logout" value="" style="endArrow=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_kabag" target="uc_logout">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin -->
+        <mxCell id="assoc_admin_kelola_user" value="" style="endArrow=none;html=1;exitX=0;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_admin" target="uc_kelola_user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_admin_master_data" value="" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_admin" target="uc_master_data">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_admin_pemeliharaan" value="" style="endArrow=none;html=1;exitX=0;exitY=0.7;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_admin" target="uc_pemeliharaan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="assoc_admin_logout" value="" style="endArrow=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="actor_admin" target="uc_logout">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Include Dependencies to Login -->
+        
+        <!-- Barang Masuk includes Login -->
+        <mxCell id="include_barang_masuk_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc_barang_masuk" target="uc_login">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="390" y="350" as="sourcePoint" />
+            <mxPoint x="550" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Barang Keluar includes Login -->
+        <mxCell id="include_barang_keluar_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc_barang_keluar" target="uc_login">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="390" y="350" as="sourcePoint" />
+            <mxPoint x="550" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Permintaan includes Login -->
+        <mxCell id="include_permintaan_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc_permintaan" target="uc_login">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="390" y="350" as="sourcePoint" />
+            <mxPoint x="550" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Pemeliharaan includes Login -->
+        <mxCell id="include_pemeliharaan_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc_pemeliharaan" target="uc_login">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="390" y="350" as="sourcePoint" />
+            <mxPoint x="550" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Verifikasi includes Login -->
+        <mxCell id="include_verifikasi_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc_verifikasi" target="uc_login">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="390" y="350" as="sourcePoint" />
+            <mxPoint x="550" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Lihat Laporan includes Login -->
+        <mxCell id="include_laporan_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc_laporan" target="uc_login">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="390" y="350" as="sourcePoint" />
+            <mxPoint x="550" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Kelola User includes Login -->
+        <mxCell id="include_kelola_user_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc_kelola_user" target="uc_login">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="390" y="350" as="sourcePoint" />
+            <mxPoint x="550" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Kelola Master Data includes Login -->
+        <mxCell id="include_master_data_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc_master_data" target="uc_login">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="390" y="350" as="sourcePoint" />
+            <mxPoint x="550" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

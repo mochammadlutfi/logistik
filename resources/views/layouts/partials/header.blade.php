@@ -9,12 +9,6 @@
                 <path d="M9 3v18"></path>
             </svg>
         </button>
-        <select class="select h-8 leading-none" id="theme-select">
-            <option value="">Default</option>
-            <option value="claude">Claude</option>
-            <option value="doom-64">Doom 64</option>
-            <option value="supabase">Supabase</option>
-        </select>
         <script>
             (() => {
                 const themeSelect = document.getElementById('theme-select');
@@ -64,20 +58,17 @@
           <div id="demo-dropdown-menu-popover" data-popover data-align="end" aria-hidden="true" class="min-w-56">
             <div role="menu" id="demo-dropdown-menu-menu" aria-labelledby="demo-dropdown-menu-trigger">
               <div role="group" aria-labelledby="account-options">
-                <div role="heading" id="account-options">My Account</div>
-                <div role="menuitem">
-                  Profile
-                </div>
-                <div role="menuitem">
-                  Ubah Password
-                </div>
+                <div role="heading" id="account-options">Akun Saya</div>
+                <a href="{{ route('profile.edit') }}" role="menuitem" class="block cursor-pointer">
+                  Profil
+                </a>
               </div>
-              <div role="menuitem" class="cursor-pointer">
-                <form method="POST" action="{{ route('logout') }}">
-                  @csrf
-                  <button type="submit" class="w-full text-left">Logout</button>
-                </form>
-              </div>
+              <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" role="menuitem" class="w-full text-left cursor-pointer">
+                  Logout
+                </button>
+              </form>
             </div>
           </div>
         </div>

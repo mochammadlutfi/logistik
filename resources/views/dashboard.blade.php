@@ -39,7 +39,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm mb-1">Permintaan Pending</p>
-                            <p class="text-3xl font-bold text-gray-800">12</p>
+                            <p class="text-3xl font-bold text-gray-800">{{ $permintaan }}</p>
                             <p class="text-yellow-600 text-sm mt-2">
                                 <i class="fas fa-clock"></i> Perlu approval
                             </p>
@@ -176,29 +176,6 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="mt-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow p-8 text-white">
-                <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <button class="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition">
-                        <i class="fas fa-plus-circle text-3xl mb-2"></i>
-                        <p class="text-sm font-semibold">Barang Masuk</p>
-                    </button>
-                    <button class="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition">
-                        <i class="fas fa-minus-circle text-3xl mb-2"></i>
-                        <p class="text-sm font-semibold">Barang Keluar</p>
-                    </button>
-                    <button class="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition">
-                        <i class="fas fa-clipboard-list text-3xl mb-2"></i>
-                        <p class="text-sm font-semibold">Buat Permintaan</p>
-                    </button>
-                    <button class="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition">
-                        <i class="fas fa-file-alt text-3xl mb-2"></i>
-                        <p class="text-sm font-semibold">Buat Laporan</p>
-                    </button>
                 </div>
             </div>
     </div>

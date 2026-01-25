@@ -30,7 +30,17 @@
                             <td class="px-4 py-3 text-sm text-gray-900">{{ $item->kode }}</td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->alasan ?? '-' }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->status ?? '-' }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">
+                                @if($item->status == 'disetujui')
+                                    <span class="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">Disetujui</span>
+                                @elseif($item->status == 'ditolak')
+                                    <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">Ditolak</span>
+                               @elseif($item->status == 'selesai')
+                                    <span class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">Selesai</span>
+                                @elseif($item->status == 'diajukan')
+                                    <span class="bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Diajukan</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->detail()->count() }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700 text-right">
                                 <div id="action-dropdown-{{ $item->id }}" class="dropdown-menu">

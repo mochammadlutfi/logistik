@@ -54,7 +54,7 @@ class PermintaanBarangController extends Controller
                 'keterangan' => $d['keterangan'],
             ]);
         }
-        return redirect()->route('permintaan-barang.index')->with('status', 'Permintaan Barang berhasil dibuat');
+        return redirect()->route('permintaan-barang.show', $data->id)->with('status', 'Permintaan Barang berhasil dibuat');
     }
 
     public function show($id){
@@ -109,13 +109,38 @@ class PermintaanBarangController extends Controller
             $barang->detail()->whereIn('id', explode(',', $validated['detail_hapus']))->delete();
         }
         
-        return redirect()->route('permintaan.index')->with('status', 'Barang berhasil diperbarui');
+        return redirect()->route('permintaan-barang.show', $id)->with('status', 'Barang berhasil diperbarui');
     }
 
     public function destroy($id)
     {
         $barang = PermintaanBarang::findOrFail($id);    
         $barang->delete();
-        return redirect()->route('permintaan.index')->with('status', 'Barang berhasil dihapus');
+        return redirect()->route('permintaan-barang.index')->with('status', 'Barang berhasil dihapus');
+    }
+
+
+    public function status($id, Request $request)
+    {
+        $barang = PermintaanBarang::findOrFail($id);
+        $barang->status = $request->status;
+        $barang->tanggal_approval = now();
+        $barang->catatan_approval = $request->alasan;
+        $barang->save();
+        return redirect()->route('permintaan-barang.show', $id)->with('status', 'Status Permintaan Barang berhasil diupdate');
+    }
+
+    public function getDetail($id)
+    {
+        $permintaan = PermintaanBarang::with(['detail' => function($q) {
+            $q->with(['barang' => function($q) {
+                $q->with('satuan');
+            }]);
+        }])->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $permintaan
+        ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Supplier;
 use App\Models\Barang;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\PermintaanBarang;
 use PDO;
 
 class BarangKeluarController extends Controller
@@ -26,15 +27,16 @@ class BarangKeluarController extends Controller
     public function create()
     {
         $isEdit = false;
-        $suppliers = Supplier::orderBy('nama_supplier')->get();
         $barang = Barang::orderBy('nama_barang')->get();
-        return view('keluar.form', compact('isEdit', 'suppliers', 'barang'));
+        $permintaan = PermintaanBarang::orderBy('id', 'DESC')->where('status', 'disetujui')->get();
+        return view('keluar.form', compact('isEdit', 'permintaan', 'barang'));
     }
-
+    
     public function store(Request $request)
     {
         // dd($request->all());
         $validated = $request->validate([
+            'permintaan_id' => ['required', 'integer', 'exists:permintaan_barang,id'],
             'tanggal' => ['required'],
             'sumber_barang' => ['nullable'],
             'tujuan_barang' => ['nullable'],
@@ -58,6 +60,11 @@ class BarangKeluarController extends Controller
                 'keterangan' => $d['keterangan'],
             ]);
         }
+
+        $permintaan = PermintaanBarang::findOrFail($validated['permintaan_id']);
+        $permintaan->status = 'selesai';
+        $permintaan->save();
+
         return redirect()->route('barang-keluar.index')->with('status', 'Barang berhasil dibuat');
     }
 

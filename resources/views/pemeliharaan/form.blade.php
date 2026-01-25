@@ -38,7 +38,7 @@
                             <thead class="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 font-medium">
-                                        Produk
+                                        Barang
                                     </th>
                                     <th scope="col" class="px-6 py-3 font-medium">
                                         Jumlah

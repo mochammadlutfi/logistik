@@ -1,0 +1,52 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.0 Chrome/140.0.7339.249 Electron/38.7.2 Safari/537.36" version="29.3.0">
+  <diagram name="Deployment Diagram" id="deployment-diagram">
+    <mxGraphModel dx="1901" dy="1145" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dbserver-node" parent="1" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=10;fontSize=14;fontStyle=1;align=left;" value="" vertex="1">
+          <mxGeometry height="220" width="280" x="660" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-comp" parent="1" style="html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="&lt;b&gt;SQL Database&lt;/b&gt;&lt;br&gt;(MySQL)" vertex="1">
+          <mxGeometry height="80" width="200" x="720" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="jpKeaOVPb5CXaC1RjwdX-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontStyle=4;fontSize=11;" value="Database Server" vertex="1">
+          <mxGeometry height="20" width="90" x="690" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="jpKeaOVPb5CXaC1RjwdX-8" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="220" width="280" x="670" y="414" as="geometry" />
+        </mxCell>
+        <mxCell id="webserver-node" parent="jpKeaOVPb5CXaC1RjwdX-8" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=10;fontSize=14;fontStyle=1" value="&lt;b&gt;Web Server&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="280" as="geometry" />
+        </mxCell>
+        <mxCell id="jpKeaOVPb5CXaC1RjwdX-7" connectable="0" parent="jpKeaOVPb5CXaC1RjwdX-8" style="group" value="" vertex="1">
+          <mxGeometry height="140" width="230" x="20" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="webfile-comp" parent="jpKeaOVPb5CXaC1RjwdX-7" style="html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="&lt;b&gt;Web File&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;(Sistem Informasi Monitoring &lt;br&gt;Logistik dan Alat Produksi)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="200" x="30" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jpKeaOVPb5CXaC1RjwdX-5" parent="jpKeaOVPb5CXaC1RjwdX-7" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontStyle=4;fontSize=11;" value="Web Server" vertex="1">
+          <mxGeometry height="20" width="110" as="geometry" />
+        </mxCell>
+        <mxCell id="jpKeaOVPb5CXaC1RjwdX-9" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="220" width="280" x="180" y="414" as="geometry" />
+        </mxCell>
+        <mxCell id="user-node" parent="jpKeaOVPb5CXaC1RjwdX-9" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=10;fontSize=14;fontStyle=1" value="&lt;b&gt;User&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="280" as="geometry" />
+        </mxCell>
+        <mxCell id="device-label" parent="jpKeaOVPb5CXaC1RjwdX-9" style="html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;align=center;" value="&lt;b&gt;«device»&lt;/b&gt;&lt;br&gt;&lt;b&gt;Web Browser&lt;/b&gt;" vertex="1">
+          <mxGeometry height="50" width="120" x="90" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="jpKeaOVPb5CXaC1RjwdX-6" parent="jpKeaOVPb5CXaC1RjwdX-9" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontStyle=4;fontSize=11;" value="User" vertex="1">
+          <mxGeometry height="20" width="110" x="20" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="jpKeaOVPb5CXaC1RjwdX-11" edge="1" parent="1" source="webserver-node" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=0;exitDy=105;exitPerimeter=0;entryX=0.996;entryY=0.477;entryDx=0;entryDy=0;entryPerimeter=0;endArrow=none;endFill=0;" target="user-node">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jpKeaOVPb5CXaC1RjwdX-12" edge="1" parent="1" source="webserver-node" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=135;exitDy=0;exitPerimeter=0;entryX=0;entryY=0;entryDx=145;entryDy=220;entryPerimeter=0;strokeColor=default;endArrow=none;endFill=0;" target="dbserver-node">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

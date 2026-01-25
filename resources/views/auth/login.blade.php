@@ -37,22 +37,16 @@
                     Keep me logged in
                 </label>
                 @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400">Forgot password?</a>
+                    <a href="{{ route('password.request') }}" class="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400">Lupa Password?</a>
                 @endif
             </div>
             <div>
-                <button type="submit" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">Sign In</button>
+                <button type="submit" class="btn w-full">Login</button>
             </div>
             <div class="mt-2">
                 @if (session('status'))
                     <p class="text-sm text-success-600">{{ session('status') }}</p>
                 @endif
-            </div>
-            <div class="mt-5">
-                <p class="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                    Belum punya akun?
-                    <a href="{{ route('register') }}" class="text-brand-500 hover:text-brand-600 dark:text-brand-400">Sign Up</a>
-                </p>
             </div>
         </div>
     </form>

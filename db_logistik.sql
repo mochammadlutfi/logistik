@@ -11,7 +11,7 @@
  Target Server Version : 80402 (8.4.2)
  File Encoding         : 65001
 
- Date: 08/01/2026 20:41:45
+ Date: 25/01/2026 21:14:45
 */
 
 SET NAMES utf8mb4;
@@ -244,6 +244,7 @@ CREATE TABLE `pencatatan_barang` (
   `catatan` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `permintaan_id` bigint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `kode_transaksi` (`kode`),
   KEY `idx_kode` (`kode`),
@@ -251,9 +252,11 @@ CREATE TABLE `pencatatan_barang` (
   KEY `idx_jenis` (`jenis`),
   KEY `pencatatan_barang_ibfk_2` (`supplier_id`),
   KEY `pencatatan_barang_ibfk_3` (`user_id`),
+  KEY `pencatatan_barang_ibfk_4` (`permintaan_id`),
   CONSTRAINT `pencatatan_barang_ibfk_2` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `pencatatan_barang_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `pencatatan_barang_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `pencatatan_barang_ibfk_4` FOREIGN KEY (`permintaan_id`) REFERENCES `permintaan_barang` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for pencatatan_barang_detail
@@ -273,7 +276,7 @@ CREATE TABLE `pencatatan_barang_detail` (
   KEY `pencatatan_barang_detail_ibfk_2` (`barang_id`),
   CONSTRAINT `pencatatan_barang_detail_ibfk_1` FOREIGN KEY (`pencatatan_id`) REFERENCES `pencatatan_barang` (`id`) ON DELETE CASCADE,
   CONSTRAINT `pencatatan_barang_detail_ibfk_2` FOREIGN KEY (`barang_id`) REFERENCES `barang` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for permintaan_barang
@@ -300,7 +303,7 @@ CREATE TABLE `permintaan_barang` (
   KEY `idx_tanggal` (`tanggal`),
   CONSTRAINT `permintaan_barang_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `permintaan_barang_ibfk_2` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for permintaan_barang_detail
@@ -320,7 +323,7 @@ CREATE TABLE `permintaan_barang_detail` (
   KEY `permintaan_barang_detail_ibfk_2` (`barang_id`),
   CONSTRAINT `permintaan_barang_detail_ibfk_1` FOREIGN KEY (`permintaan_id`) REFERENCES `permintaan_barang` (`id`) ON DELETE CASCADE,
   CONSTRAINT `permintaan_barang_detail_ibfk_2` FOREIGN KEY (`barang_id`) REFERENCES `barang` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for satuan

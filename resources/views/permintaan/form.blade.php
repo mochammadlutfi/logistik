@@ -22,8 +22,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="grid gap-3">
                             <label for="tanggal">Tanggal</label>
-                            <input type="text" class="datepicker" id="tanggal" name="tanggal" value="{{ old('tanggal', $isEdit ? $item->tanggal : '') }}"
-                                autofocus />
+                            <input type="text" class="datepicker" id="tanggal" name="tanggal" value="{{ old('tanggal', $isEdit ? \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') : \Carbon\Carbon::now()->format('d-m-Y')) }}"/>
                             @error('tanggal')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
@@ -38,7 +37,7 @@
                             <thead class="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 font-medium">
-                                        Produk
+                                        Barang
                                     </th>
                                     <th scope="col" class="px-6 py-3 font-medium">
                                         Jumlah
@@ -77,6 +76,7 @@
                                                         <div role="listbox" id="select-barang-0-listbox" aria-orientation="vertical" aria-labelledby="select-barang-0-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
                                                         <div role="group" aria-labelledby="group-label-select-barang-0">
                                                             <div role="heading" id="group-label-select-barang-0">Barang</div>
+                                                            <div id="select-barang-0-option-0" role="option" data-value="" data-keywords="Pilih">Pilih...</div>
                                                             @foreach ($barang as $b)
                                                             <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" {{ old('detail['.$k.'][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
                                                                 {{ $b->nama_barang }}
@@ -156,6 +156,16 @@
                                 </tr>
                                 @endif
                             </tbody>
+                            <tfoot class="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4">
+                                        <button type="button" class="btn-sm btn-primary w-full" onclick="addRow()">
+                                            <i class="fa-solid fa-plus"></i>
+                                            Tambah Barang
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
 

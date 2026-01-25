@@ -41,7 +41,10 @@
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
         <script>
             $(".datepicker").flatpickr({
+                altInput: true,
+                altFormat: "d F Y",
                 dateFormat: "Y-m-d",
+                defaultDate: "today",
             });
 
         </script>
