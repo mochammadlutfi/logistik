@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PencatatanBarang;
 use App\Models\Supplier;
 use App\Models\Barang;
+use App\Models\Gudang; // Added this line
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use PDO;
@@ -28,7 +29,17 @@ class BarangMasukController extends Controller
         $isEdit = false;
         $suppliers = Supplier::orderBy('nama_supplier')->get();
         $barang = Barang::orderBy('nama_barang')->get();
-        return view('masuk.form', compact('isEdit', 'suppliers', 'barang'));
+        
+        $user = auth()->user();
+        $query = Gudang::where('is_active', true)->orderBy('nama_gudang');
+        
+        if (in_array($user->role, ['Staf Gudang Logistik', 'Gudang Logistik'])) {
+            $query->where('id', $user->gudang_id);
+        }
+        
+        $gudang = $query->get();
+
+        return view('masuk.form', compact('isEdit', 'suppliers', 'barang', 'gudang'));
     }
 
     public function store(Request $request)
@@ -36,6 +47,7 @@ class BarangMasukController extends Controller
         // dd($request->all());
         $validated = $request->validate([
             'tanggal' => ['required'],
+            'gudang_id' => ['required', 'exists:gudang,id'],
             'supplier_id' => ['required', 'integer', 'exists:suppliers,id'],
             'sumber_barang' => ['nullable'],
             'tujuan_barang' => ['nullable'],
@@ -49,16 +61,29 @@ class BarangMasukController extends Controller
         $validated['kode'] = 'WH-IN/' . date('Ym').'/' .str_pad(PencatatanBarang::where('jenis', 'masuk')->count() + 1, 4, '0', STR_PAD_LEFT);
         $validated['jenis'] = 'masuk';
         $validated['user_id'] = auth()->user()->id;
-        $data = PencatatanBarang::create($validated);
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
+            $data = PencatatanBarang::create($validated);
 
-        foreach($validated['detail'] as $d){
-            // dd($d);
-            $data->detail()->create([
-                'barang_id' => $d['barang_id'],
-                'jml' => $d['jml'],
-                'keterangan' => $d['keterangan'],
-            ]);
-        }
+            foreach($validated['detail'] as $d){
+                $data->detail()->create([
+                    'barang_id' => $d['barang_id'],
+                    'jml' => $d['jml'],
+                    'keterangan' => $d['keterangan'],
+                ]);
+
+                // Update Stok Gudang
+                $stokGudang = \App\Models\StokGudang::firstOrCreate(
+                    ['gudang_id' => $validated['gudang_id'], 'barang_id' => $d['barang_id']],
+                    ['stok_tersedia' => 0]
+                );
+                $stokGudang->increment('stok_tersedia', $d['jml']);
+
+                // Update Total Stok Barang
+                \App\Models\Barang::where('id', $d['barang_id'])->increment('stok_total', $d['jml']);
+            }
+        });
+
         return redirect()->route('barang-masuk.index')->with('status', 'Barang berhasil dibuat');
     }
 
@@ -78,8 +103,17 @@ class BarangMasukController extends Controller
         }])->findOrFail($id);
         $barang = Barang::orderBy('nama_barang')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
+        
+        $user = auth()->user();
+        $query = Gudang::where('is_active', true)->orderBy('nama_gudang');
+        
+        if (in_array($user->role, ['Staf Gudang Logistik', 'Gudang Logistik'])) {
+            $query->where('id', $user->gudang_id);
+        }
+        
+        $gudang = $query->get();
 
-        return view('masuk.form', compact('item', 'barang', 'suppliers', 'isEdit'));
+        return view('masuk.form', compact('item', 'barang', 'suppliers', 'isEdit', 'gudang'));
     }
 
     public function update(Request $request, $id)

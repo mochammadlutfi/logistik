@@ -34,7 +34,7 @@
                             <td class="px-4 py-3 text-sm text-gray-900">{{ $item->nama_barang }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->kategori?->nama_kategori }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->satuan?->nama_satuan }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->stok_tersedia }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ number_format($item->total_stock) }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ number_format((float) $item->harga_satuan, 2, '.', ',') }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ ucfirst($item->kondisi_fisik) }}</td>
                             <td class="px-4 py-3 text-sm">

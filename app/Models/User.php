@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'gudang_id',
     ];
 
     /**
@@ -40,6 +41,19 @@ class User extends Authenticatable
      * @return array<string, string>
      */
     protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    public function gudang()
+    {
+        return $this->belongsTo(Gudang::class, 'gudang_id');
+    }
+
+    protected function casts_removed(): array
     {
         return [
             'email_verified_at' => 'datetime',

@@ -19,7 +19,7 @@ class Barang extends Model
         'satuan_id',
         'stok_minimum',
         'stok_maksimum',
-        'stok_tersedia',
+        'stok_total',
         'harga_satuan',
         'lokasi_penyimpanan',
         'kondisi_fisik',
@@ -33,7 +33,25 @@ class Barang extends Model
         return [
             'is_active' => 'boolean',
             'harga_satuan' => 'decimal:2',
+            'stok_total' => 'integer',
         ];
+    }
+
+    public function getTotalStockAttribute()
+    {
+        return $this->stok_total ?? 0;
+    }
+
+    public function stokGudang()
+    {
+        return $this->hasMany(StokGudang::class, 'barang_id');
+    }
+
+    public function gudang()
+    {
+        return $this->belongsToMany(Gudang::class, 'stok_gudang', 'barang_id', 'gudang_id')
+                    ->withPivot('stok_tersedia', 'stok_minimum', 'stok_maksimum', 'lokasi_rak')
+                    ->withTimestamps();
     }
 
     public function kategori()

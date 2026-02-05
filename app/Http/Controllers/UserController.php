@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Gudang;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
@@ -12,8 +13,9 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $items = User::orderByDesc('created_at')->get();
-        return view('user', ['items' => $items]);
+        $items = User::orderByDesc('created_at')->with('gudang')->get();
+        $gudangs = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
+        return view('user', ['items' => $items, 'gudangs' => $gudangs]);
     }
 
     public function store(Request $request)
@@ -22,6 +24,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')],
             'role' => ['required', 'string', 'max:150'],
+            'gudang_id' => ['nullable', 'exists:gudang,id'],
             'password' => ['required', 'string', 'min:8', 'max:255', 'confirmed'],
         ]);
 
@@ -39,6 +42,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')->ignore($user->id)],
             'role' => ['required', 'string', 'max:150'],
+            'gudang_id' => ['nullable', 'exists:gudang,id'],
             'password' => ['nullable', 'string', 'min:8', 'max:255', 'confirmed'],
         ]);
 

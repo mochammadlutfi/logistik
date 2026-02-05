@@ -36,7 +36,7 @@ class BarangController extends Controller
             'satuan_id' => ['required', 'integer', 'exists:satuan,id'],
             'stok_minimum' => ['nullable', 'integer', 'min:0'],
             'stok_maksimum' => ['nullable', 'integer', 'min:0'],
-            'stok_tersedia' => ['nullable', 'integer', 'min:0'],
+            'stok_total' => ['nullable', 'integer', 'min:0'],
             'harga_satuan' => ['nullable', 'numeric', 'min:0'],
             'lokasi_penyimpanan' => ['nullable', 'string', 'max:100'],
             'kondisi_fisik' => ['required', Rule::in(['baik','rusak','habis','diperbaiki'])],
@@ -47,7 +47,7 @@ class BarangController extends Controller
 
         if (!array_key_exists('stok_minimum', $validated)) { $validated['stok_minimum'] = 0; }
         if (!array_key_exists('stok_maksimum', $validated)) { $validated['stok_maksimum'] = 0; }
-        if (!array_key_exists('stok_tersedia', $validated)) { $validated['stok_tersedia'] = 0; }
+        if (!array_key_exists('stok_total', $validated)) { $validated['stok_total'] = 0; }
         if (!array_key_exists('harga_satuan', $validated)) { $validated['harga_satuan'] = 0; }
         if (!array_key_exists('is_active', $validated)) { $validated['is_active'] = true; }
 
@@ -56,7 +56,7 @@ class BarangController extends Controller
     }
 
     public function show($id){
-        $item = Barang::with(['kategori', 'satuan'])->findOrFail($id);
+        $item = Barang::with(['kategori', 'satuan', 'gudang'])->findOrFail($id);
         // dd($item->toArray());
         return view('master.barang.show', compact('item'));
     }
@@ -79,7 +79,7 @@ class BarangController extends Controller
             'satuan_id' => ['required', 'integer', 'exists:satuan,id'],
             'stok_minimum' => ['nullable', 'integer', 'min:0'],
             'stok_maksimum' => ['nullable', 'integer', 'min:0'],
-            'stok_tersedia' => ['nullable', 'integer', 'min:0'],
+            'stok_total' => ['nullable', 'integer', 'min:0'],
             'harga_satuan' => ['nullable', 'numeric', 'min:0'],
             'lokasi_penyimpanan' => ['nullable', 'string', 'max:100'],
             'kondisi_fisik' => ['required', Rule::in(['baik','rusak','habis','diperbaiki'])],

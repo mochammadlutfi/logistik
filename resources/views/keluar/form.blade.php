@@ -19,7 +19,12 @@
                     @method('PUT')
                     @endif
                     <input type="hidden" name="detail_hapus" id="detail_hapus" value="" />
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="grid gap-3">
+                            <label for="gudang_id">Gudang</label>
+                            <x-select-gudang :items="$gudang" :selected="old('gudang_id', $isEdit ? $item->gudang_id : '')" />
+                            @error('gudang_id')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
+                        </div>
                         <div class="grid gap-3">
                             <label for="permintaan_id">No Permintaan</label>
                             <div id="select-permintaan" class="w-full select">

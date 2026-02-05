@@ -13,6 +13,7 @@ class PemeliharaanBarang extends Model
 
     protected $fillable = [
         'kode',
+        'gudang_id',
         'jenis',
         'deskripsi',
         'status',
@@ -28,6 +29,11 @@ class PemeliharaanBarang extends Model
             'tanggal' => 'date',
             'biaya' => 'decimal:2',
         ];
+    }
+
+    public function gudang()
+    {
+        return $this->belongsTo(Gudang::class, 'gudang_id');
     }
 
     public function petugas()

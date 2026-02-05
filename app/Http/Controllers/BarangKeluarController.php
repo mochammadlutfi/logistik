@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PencatatanBarang;
 use App\Models\Supplier;
 use App\Models\Barang;
+use App\Models\Gudang; // Added this line
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\PermintaanBarang;
@@ -30,7 +31,8 @@ class BarangKeluarController extends Controller
         $isEdit = false;
         $barang = Barang::orderBy('nama_barang')->get();
         $permintaan = PermintaanBarang::orderBy('id', 'DESC')->where('status', 'disetujui')->get();
-        return view('keluar.form', compact('isEdit', 'permintaan', 'barang'));
+        $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
+        return view('keluar.form', compact('isEdit', 'permintaan', 'barang', 'gudang'));
     }
     
     public function store(Request $request)
@@ -38,6 +40,7 @@ class BarangKeluarController extends Controller
         // dd($request->all());
         $validated = $request->validate([
             'permintaan_id' => ['required', 'integer', 'exists:permintaan_barang,id'],
+            'gudang_id' => ['required', 'exists:gudang,id'],
             'tanggal' => ['required'],
             'sumber_barang' => ['nullable'],
             'tujuan_barang' => ['nullable'],
@@ -51,16 +54,34 @@ class BarangKeluarController extends Controller
         $validated['kode'] = 'WH-OUT/' . date('Ym').'/' .str_pad(PencatatanBarang::where('jenis', 'keluar')->count() + 1, 4, '0', STR_PAD_LEFT);
         $validated['jenis'] = 'keluar';
         $validated['user_id'] = auth()->user()->id;
-        $data = PencatatanBarang::create($validated);
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
+            $data = PencatatanBarang::create($validated);
 
-        foreach($validated['detail'] as $d){
-            // dd($d);
-            $data->detail()->create([
-                'barang_id' => $d['barang_id'],
-                'jml' => $d['jml'],
-                'keterangan' => $d['keterangan'],
-            ]);
-        }
+            foreach($validated['detail'] as $d){
+                // Check Stock Availability at Gudang
+                $stokGudang = \App\Models\StokGudang::where('gudang_id', $validated['gudang_id'])
+                    ->where('barang_id', $d['barang_id'])
+                    ->first();
+
+                if (!$stokGudang || $stokGudang->stok_tersedia < $d['jml']) {
+                    $barangName = \App\Models\Barang::find($d['barang_id'])->nama_barang ?? 'Unknown';
+                    throw new \Illuminate\Validation\ValidationException(\Illuminate\Support\Facades\Validator::make([], []), [
+                        'detail' => "Stok tidak cukup untuk barang {$barangName} di gudang yang dipilih."
+                    ]);
+                }
+
+                $data->detail()->create([
+                    'barang_id' => $d['barang_id'],
+                    'jml' => $d['jml'],
+                    'keterangan' => $d['keterangan'],
+                ]);
+
+                // Update Stok
+                $stokGudang->decrement('stok_tersedia', $d['jml']);
+                \App\Models\Barang::where('id', $d['barang_id'])->decrement('stok_total', $d['jml']);
+            }
+        });
 
         $permintaan = PermintaanBarang::findOrFail($validated['permintaan_id']);
         $permintaan->status = 'selesai';
@@ -85,8 +106,9 @@ class BarangKeluarController extends Controller
         }])->findOrFail($id);
         $barang = Barang::orderBy('nama_barang')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
+        $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
 
-        return view('keluar.form', compact('item', 'barang', 'suppliers', 'isEdit'));
+        return view('keluar.form', compact('item', 'barang', 'suppliers', 'isEdit', 'gudang'));
     }
 
     public function update(Request $request, $id)

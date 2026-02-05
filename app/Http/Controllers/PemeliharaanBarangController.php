@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PemeliharaanBarang;
 use App\Models\Supplier;
 use App\Models\Barang;
+use App\Models\Gudang; // Added this line
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use PDO;
@@ -28,7 +29,8 @@ class PemeliharaanBarangController extends Controller
         $isEdit = false;
         $suppliers = Supplier::orderBy('nama_supplier')->get();
         $barang = Barang::orderBy('nama_barang')->get();
-        return view('pemeliharaan.form', compact('isEdit', 'suppliers', 'barang'));
+        $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get(); 
+        return view('pemeliharaan.form', compact('isEdit', 'suppliers', 'barang', 'gudang'));
     }
 
     public function store(Request $request)
@@ -36,6 +38,7 @@ class PemeliharaanBarangController extends Controller
         // dd($request->all());
         $validated = $request->validate([
             'tanggal' => ['required'],
+            'gudang_id' => ['required', 'exists:gudang,id'],
             'alasan' => ['nullable'],
             'catatan' => ['nullable', 'string'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
@@ -74,8 +77,9 @@ class PemeliharaanBarangController extends Controller
         }])->findOrFail($id);
         $barang = Barang::orderBy('nama_barang')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
+        $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
 
-        return view('pemeliharaan.form', compact('item', 'barang', 'suppliers', 'isEdit'));
+        return view('pemeliharaan.form', compact('item', 'barang', 'suppliers', 'isEdit', 'gudang'));
     }
 
     public function update(Request $request, $id)

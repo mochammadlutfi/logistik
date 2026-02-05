@@ -19,7 +19,19 @@
                     @method('PUT')
                     @endif
                     <input type="hidden" name="detail_hapus" id="detail_hapus" value="" />
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="grid gap-3">
+                            <label for="gudang_id">Gudang</label>
+                            <select class="select w-full p-2 rounded-md border border-gray-300" name="gudang_id" id="gudang_id">
+                                <option value="">Pilih Gudang...</option>
+                                @foreach($gudang as $g)
+                                    <option value="{{ $g->id }}" {{ old('gudang_id', $isEdit ? $item->gudang_id : '') == $g->id ? 'selected' : '' }}>
+                                        {{ $g->nama_gudang }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('gudang_id')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
+                        </div>
                         <div class="grid gap-3">
                             <label for="tanggal">Tanggal</label>
                             <input type="text" class="datepicker" id="tanggal" name="tanggal" value="{{ old('tanggal', $isEdit ? $item->tanggal : '') }}"

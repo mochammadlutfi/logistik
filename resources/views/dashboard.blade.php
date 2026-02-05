@@ -89,36 +89,24 @@
                                 </tr>
                             </thead>
                             <tbody class="text-sm">
+                                @forelse($low_stock_items as $item)
                                 <tr class="border-b">
-                                    <td class="py-3 text-gray-600">10000003</td>
-                                    <td class="py-3">SHIM PACK</td>
-                                    <td class="py-3 font-semibold">8</td>
-                                    <td class="py-3"><span class="badge badge-danger">Kritis</span></td>
+                                    <td class="py-3 text-gray-600">{{ $item->kode_barang }}</td>
+                                    <td class="py-3">{{ $item->nama_barang }}</td>
+                                    <td class="py-3 font-semibold">{{ $item->stok_total }}</td>
+                                    <td class="py-3">
+                                        @if($item->stok_total == 0)
+                                            <span class="badge badge-danger">Habis</span>
+                                        @else
+                                            <span class="badge badge-warning">Rendah</span>
+                                        @endif
+                                    </td>
                                 </tr>
-                                <tr class="border-b">
-                                    <td class="py-3 text-gray-600">10000020</td>
-                                    <td class="py-3">CUP BEARING</td>
-                                    <td class="py-3 font-semibold">12</td>
-                                    <td class="py-3"><span class="badge badge-warning">Rendah</span></td>
-                                </tr>
-                                <tr class="border-b">
-                                    <td class="py-3 text-gray-600">10000048</td>
-                                    <td class="py-3">FILTER AIR</td>
-                                    <td class="py-3 font-semibold">15</td>
-                                    <td class="py-3"><span class="badge badge-warning">Rendah</span></td>
-                                </tr>
-                                <tr class="border-b">
-                                    <td class="py-3 text-gray-600">10000086</td>
-                                    <td class="py-3">ADAPTER</td>
-                                    <td class="py-3 font-semibold">9</td>
-                                    <td class="py-3"><span class="badge badge-danger">Kritis</span></td>
-                                </tr>
+                                @empty
                                 <tr>
-                                    <td class="py-3 text-gray-600">10000091</td>
-                                    <td class="py-3">BEARING CONE</td>
-                                    <td class="py-3 font-semibold">11</td>
-                                    <td class="py-3"><span class="badge badge-warning">Rendah</span></td>
+                                    <td colspan="4" class="py-3 text-center text-gray-500">Tidak ada barang dengan stok menipis</td>
                                 </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -143,36 +131,26 @@
                                 </tr>
                             </thead>
                             <tbody class="text-sm">
+                                @forelse($recent_requests as $req)
                                 <tr class="border-b">
-                                    <td class="py-3 text-gray-600">REQ-001</td>
-                                    <td class="py-3">Budi Santoso</td>
-                                    <td class="py-3">18 Nov 2025</td>
-                                    <td class="py-3"><span class="badge badge-warning">Pending</span></td>
+                                    <td class="py-3 text-gray-600">{{ $req->kode }}</td>
+                                    <td class="py-3">{{ $req->pemohon->name ?? '-' }}</td>
+                                    <td class="py-3">{{ \Carbon\Carbon::parse($req->tanggal)->format('d M Y') }}</td>
+                                    <td class="py-3">
+                                        @if($req->status == 'disetujui' || $req->status == 'selesai')
+                                            <span class="badge badge-success">{{ ucfirst($req->status) }}</span>
+                                        @elseif($req->status == 'ditolak')
+                                            <span class="badge badge-danger">{{ ucfirst($req->status) }}</span>
+                                        @else
+                                            <span class="badge badge-warning">{{ ucfirst($req->status) }}</span>
+                                        @endif
+                                    </td>
                                 </tr>
-                                <tr class="border-b">
-                                    <td class="py-3 text-gray-600">REQ-002</td>
-                                    <td class="py-3">Siti Nurhaliza</td>
-                                    <td class="py-3">18 Nov 2025</td>
-                                    <td class="py-3"><span class="badge badge-warning">Pending</span></td>
-                                </tr>
-                                <tr class="border-b">
-                                    <td class="py-3 text-gray-600">REQ-003</td>
-                                    <td class="py-3">Ahmad Yani</td>
-                                    <td class="py-3">17 Nov 2025</td>
-                                    <td class="py-3"><span class="badge badge-success">Disetujui</span></td>
-                                </tr>
-                                <tr class="border-b">
-                                    <td class="py-3 text-gray-600">REQ-004</td>
-                                    <td class="py-3">Rina Kusuma</td>
-                                    <td class="py-3">17 Nov 2025</td>
-                                    <td class="py-3"><span class="badge badge-success">Disetujui</span></td>
-                                </tr>
+                                @empty
                                 <tr>
-                                    <td class="py-3 text-gray-600">REQ-005</td>
-                                    <td class="py-3">Joko Widodo</td>
-                                    <td class="py-3">16 Nov 2025</td>
-                                    <td class="py-3"><span class="badge badge-danger">Ditolak</span></td>
+                                    <td colspan="4" class="py-3 text-center text-gray-500">Belum ada permintaan barang</td>
                                 </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
