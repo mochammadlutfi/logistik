@@ -8,6 +8,7 @@ use App\Models\Barang;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\PermintaanBarang;
+use Barryvdh\DomPDF\Facade\Pdf;
 use PDO;
 
 class BarangKeluarController extends Controller
@@ -126,8 +127,21 @@ class BarangKeluarController extends Controller
 
     public function destroy($id)
     {
-        $barang = PencatatanBarang::findOrFail($id);    
+        $barang = PencatatanBarang::findOrFail($id);
         $barang->delete();
         return redirect()->route('barang-keluar.index')->with('status', 'Barang berhasil dihapus');
+    }
+
+    public function exportPdf($id)
+    {
+        $item = PencatatanBarang::with(['supplier', 'detail' => function($q){
+            return $q->with(['barang.satuan']);
+        }])->findOrFail($id);
+
+        $pdf = Pdf::loadView('keluar.pdf.surat-pengeluaran', compact('item'));
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = 'surat-pengeluaran-' . str_replace('/', '-', $item->kode) . '.pdf';
+        return $pdf->download($filename);
     }
 }

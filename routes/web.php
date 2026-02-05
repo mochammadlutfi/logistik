@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::get('permintaan-barang/{id}/detail', [PermintaanBarangController::class, 'getDetail'])->name('permintaan-barang.detail');
     Route::resource('barang-masuk', BarangMasukController::class);
     Route::resource('barang-keluar', BarangKeluarController::class);
+    Route::get('barang-keluar/{id}/export-pdf', [BarangKeluarController::class, 'exportPdf'])->name('barang-keluar.export-pdf');
     Route::resource('pemeliharaan-barang', PemeliharaanBarangController::class);
 
     // Laporan Routes

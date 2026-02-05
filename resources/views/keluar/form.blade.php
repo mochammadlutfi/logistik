@@ -78,6 +78,9 @@
                                         Barang
                                     </th>
                                     <th scope="col" class="px-6 py-3 font-medium">
+                                        Satuan
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 font-medium">
                                         Jumlah
                                     </th>
                                     <th scope="col" class="px-6 py-3 font-medium">
@@ -115,7 +118,7 @@
                                                         <div role="group" aria-labelledby="group-label-select-barang-0">
                                                             <div role="heading" id="group-label-select-barang-0">Barang</div>
                                                             @foreach ($barang as $b)
-                                                            <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" {{ old('detail['.$k.'][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
+                                                            <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" {{ old('detail['.$k.'][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
                                                                 {{ $b->nama_barang }}
                                                                 <span class="badge badge-secondary">{{ $b->satuan->nama_satuan }}</span>
                                                             </div>
@@ -125,6 +128,9 @@
                                                     </div>
                                                     <input type="hidden" name="detail[{{ $k }}][barang_id]" value="{{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') }}" />
                                                 </div>
+                                            </td>
+                                            <td class="px-6 py-4" width="120px">
+                                                <span class="satuan-display text-sm">{{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') ? $barang->where('id', old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : ''))->first()->satuan->nama_satuan : '-' }}</span>
                                             </td>
                                             <td class="px-6 py-4" width="140px">
                                                 <input type="number" id="jml-{{ $k }}" class="w-full" name="detail[{{ $k }}][jml]"
@@ -166,7 +172,7 @@
                                                     <div role="heading" id="group-label-select-barang-0">Barang</div>
 
                                                     @foreach ($barang as $b)
-                                                    <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" {{ old('detail[0][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
+                                                    <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" {{ old('detail[0][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
                                                         {{ $b->nama_barang }}
                                                         <span class="text-xs text-muted-foreground">{{ $b->satuan->nama_satuan }}</span>
                                                     </div>
@@ -176,6 +182,9 @@
                                             </div>
                                             <input type="hidden" name="detail[0][barang_id]" value="{{ old('detail[0][barang_id]', $isEdit ? $item->barang_id : '') }}" />
                                         </div>
+                                    </td>
+                                    <td class="px-6 py-4" width="120px">
+                                        <span class="satuan-display text-sm">-</span>
                                     </td>
                                     <td class="px-6 py-4" width="140px">
                                         <input type="number" id="jml-0" class="w-full" name="detail[0][jml]"
@@ -195,7 +204,7 @@
                             </tbody>
                             <tfoot class="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
                                 <tr>
-                                    <td colspan="4" class="px-6 py-4">
+                                    <td colspan="5" class="px-6 py-4">
                                         <button type="button" class="btn-sm btn-primary w-full" onclick="addRow()">
                                             <i class="fa-solid fa-plus"></i>
                                             Tambah Barang
@@ -268,6 +277,15 @@
                 if (labelSpan) labelSpan.textContent = option.textContent.trim();
                 if (hiddenInput) hiddenInput.value = option.dataset.value || '';
                 if (permintaanInput) permintaanInput.value = option.dataset.value || '';
+
+                // Update satuan display
+                const row = container.closest('tr');
+                if (row) {
+                    const satuanDisplay = row.querySelector('.satuan-display');
+                    if (satuanDisplay) {
+                        satuanDisplay.textContent = option.dataset.satuan || '-';
+                    }
+                }
 
                 // Update aria-selected
                 container.querySelectorAll('[role="option"][aria-selected="true"]').forEach(el => el.removeAttribute('aria-selected'));
@@ -374,11 +392,13 @@
             const catatan = row.querySelector('input[type="text"][name$="[keterangan]"]');
             const idHidden = row.querySelector('input[type="hidden"][name$="[id]"]');
             const labelSpan = row.querySelector('.truncate');
+            const satuanDisplay = row.querySelector('.satuan-display');
             if (hidden) hidden.value = '';
             if (jumlah) jumlah.value = 0;
             if (catatan) catatan.value = '';
             if (idHidden) idHidden.value = '';
             if (labelSpan) labelSpan.textContent = 'Pilih...';
+            if (satuanDisplay) satuanDisplay.textContent = '-';
             
             // Reset select component state
             const selectContainer = row.querySelector('.select');
@@ -496,7 +516,7 @@
                                 <div role="group" aria-labelledby="group-label-select-barang-${index}">
                                     <div role="heading" id="group-label-select-barang-${index}">Barang</div>
                                     ${barangData.map(b => `
-                                        <div id="select-barang-${index}-option-${b.id}" role="option" data-value="${b.id}" ${detail.barang_id == b.id ? 'aria-selected="true"' : ''} data-keywords="${b.nama_barang}">
+                                        <div id="select-barang-${index}-option-${b.id}" role="option" data-value="${b.id}" data-satuan="${b.satuan ? b.satuan.nama_satuan : ''}" ${detail.barang_id == b.id ? 'aria-selected="true"' : ''} data-keywords="${b.nama_barang}">
                                             ${b.nama_barang}
                                             <span class="text-xs text-muted-foreground">${b.satuan ? b.satuan.nama_satuan : ''}</span>
                                         </div>
@@ -506,6 +526,9 @@
                             </div>
                             <input type="hidden" name="detail[${index}][barang_id]" value="${detail.barang_id}" />
                         </div>
+                    </td>
+                    <td class="px-6 py-4" width="120px">
+                        <span class="satuan-display text-sm">${satuanNama || '-'}</span>
                     </td>
                     <td class="px-6 py-4" width="140px">
                         <input type="number" id="jml-${index}" class="w-full" name="detail[${index}][jml]" value="${detail.jml || 0}" min="0" />

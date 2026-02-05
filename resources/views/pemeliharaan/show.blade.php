@@ -49,6 +49,9 @@
                                     <th scope="col" class="px-6 py-3 font-medium" width="40%">
                                         Produk
                                     </th>
+                                    <th scope="col" class="px-6 py-3 font-medium" width="120px">
+                                        Satuan
+                                    </th>
                                     <th scope="col" class="px-6 py-3 font-medium" width="140px">
                                         Jumlah
                                     </th>
@@ -62,6 +65,9 @@
                                     <tr class="bg-neutral-primary border-b border-default">
                                         <td scope="row" class="px-6 py-4" width="40%">
                                             {{ $d->barang?->nama_barang }}
+                                        </td>
+                                        <td class="px-6 py-4" width="120px">
+                                            {{ $d->barang?->satuan?->nama_satuan ?? '-' }}
                                         </td>
                                         <td class="px-6 py-4" width="140px">
                                             {{ $d->jml ?? '0'}}
