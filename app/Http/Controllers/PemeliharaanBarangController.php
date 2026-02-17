@@ -15,7 +15,7 @@ class PemeliharaanBarangController extends Controller
 {
     public function index(Request $request)
     {
-        $items = PemeliharaanBarang::with([ 'detail' => function($query){
+        $items = PemeliharaanBarang::with(['gudang', 'detail' => function($query){
             $query->with(['barang']);
         }])
         ->orderByDesc('created_at')->get();
@@ -27,10 +27,9 @@ class PemeliharaanBarangController extends Controller
     public function create()
     {
         $isEdit = false;
-        $suppliers = Supplier::orderBy('nama_supplier')->get();
         $barang = Barang::orderBy('nama_barang')->get();
-        $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get(); 
-        return view('pemeliharaan.form', compact('isEdit', 'suppliers', 'barang', 'gudang'));
+        $gudang = Gudang::orderBy('nama_gudang')->get(); 
+        return view('pemeliharaan.form', compact('isEdit', 'barang', 'gudang'));
     }
 
     public function store(Request $request)
@@ -39,15 +38,16 @@ class PemeliharaanBarangController extends Controller
         $validated = $request->validate([
             'tanggal' => ['required'],
             'gudang_id' => ['required', 'exists:gudang,id'],
-            'alasan' => ['nullable'],
             'catatan' => ['nullable', 'string'],
+            'biaya' => ['required', 'integer', 'min:0'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
             'detail.*.jml' => ['nullable', 'integer', 'min:0'],
             'detail.*.keterangan' => ['nullable', 'string']
         ]);
         
-        $validated['kode'] = 'REQ/' . date('Ym').'/' .str_pad(PemeliharaanBarang::count() + 1, 4, '0', STR_PAD_LEFT);
-        $validated['user_id']= auth()->user()->id;
+        $validated['kode'] = 'MTN/' . date('Ym').'/' .str_pad(PemeliharaanBarang::count() + 1, 4, '0', STR_PAD_LEFT);
+        $validated['petugas_id'] = auth()->user()->id;
+        $validated['status'] = 'pending';
         $data = PemeliharaanBarang::create($validated);
 
         foreach($validated['detail'] as $d){
@@ -67,8 +67,6 @@ class PemeliharaanBarangController extends Controller
         }])->findOrFail($id);
         return view('pemeliharaan.show', compact('item'));
     }
-
-
 
     public function edit($id){
         $isEdit = true;
@@ -122,5 +120,20 @@ class PemeliharaanBarangController extends Controller
         $barang = PemeliharaanBarang::findOrFail($id);    
         $barang->delete();
         return redirect()->route('pemeliharaan-barang.index')->with('status', 'Barang berhasil dihapus');
+    }
+
+    public function status($id, Request $request)
+    {
+        $item = PemeliharaanBarang::findOrFail($id);
+        $item->status = $request->status;
+
+        if (in_array($request->status, ['disetujui', 'ditolak'])) {
+            $item->tanggal_approval = now();
+            $item->catatan_approval = $request->alasan;
+            $item->approved_by = auth()->id();
+        }
+
+        $item->save();
+        return redirect()->route('pemeliharaan-barang.show', $id)->with('status', 'Status Pemeliharaan Barang berhasil diupdate');
     }
 }

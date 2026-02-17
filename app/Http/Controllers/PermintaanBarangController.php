@@ -14,7 +14,7 @@ class PermintaanBarangController extends Controller
 {
     public function index(Request $request)
     {
-        $items = PermintaanBarang::with([ 'detail' => function($query){
+        $items = PermintaanBarang::with(['detail' => function($query){
             $query->with(['barang']);
         }])
         ->orderByDesc('created_at')->get();

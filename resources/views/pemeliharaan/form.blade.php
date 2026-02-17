@@ -19,7 +19,7 @@
                     @method('PUT')
                     @endif
                     <input type="hidden" name="detail_hapus" id="detail_hapus" value="" />
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="grid gap-3">
                             <label for="gudang_id">Gudang</label>
                             <select class="select w-full p-2 rounded-md border border-gray-300" name="gudang_id" id="gudang_id">
@@ -39,8 +39,9 @@
                             @error('tanggal')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
-                            <label for="petugas">Petugas</label>
-                            <input type="text" id="petugas" name="petugas" value="{{ old('petugas', $isEdit ? $item->petugas : '') }}" />
+                            <label for="biaya">Biaya</label>
+                            <input type="number" id="biaya" name="biaya" value="{{ old('biaya', $isEdit ? $item->biaya : 0) }}" min="0" />
+                            @error('biaya')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     

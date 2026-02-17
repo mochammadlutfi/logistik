@@ -45,6 +45,7 @@
                 altFormat: "d F Y",
                 dateFormat: "Y-m-d",
                 defaultDate: "today",
+                minDate: "today"
             });
 
         </script>

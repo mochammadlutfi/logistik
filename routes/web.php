@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('barang-keluar', BarangKeluarController::class);
     Route::get('barang-keluar/{id}/export-pdf', [BarangKeluarController::class, 'exportPdf'])->name('barang-keluar.export-pdf');
     Route::resource('pemeliharaan-barang', PemeliharaanBarangController::class);
+    Route::put('pemeliharaan-barang/{id}/status', [PemeliharaanBarangController::class, 'status'])->name('pemeliharaan-barang.status');
     
     // Multi-Gudang Routes
     Route::resource('gudang', GudangController::class);

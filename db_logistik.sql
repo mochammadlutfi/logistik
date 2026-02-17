@@ -11,7 +11,7 @@
  Target Server Version : 80402 (8.4.2)
  File Encoding         : 65001
 
- Date: 06/02/2026 00:09:31
+ Date: 18/02/2026 05:59:13
 */
 
 SET NAMES utf8mb4;
@@ -538,8 +538,8 @@ CREATE TABLE `cache` (
 -- Records of cache
 -- ----------------------------
 BEGIN;
-INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES ('laravel-cache-admin@demo.com|127.0.0.1', 'i:1;', 1769952050);
-INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES ('laravel-cache-admin@demo.com|127.0.0.1:timer', 'i:1769952050;', 1769952050);
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES ('laravel-cache-admin@demo.com|127.0.0.1', 'i:3;', 1770794123);
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES ('laravel-cache-admin@demo.com|127.0.0.1:timer', 'i:1770794123;', 1770794123);
 COMMIT;
 
 -- ----------------------------
@@ -780,7 +780,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of migrations
@@ -789,6 +789,7 @@ BEGIN;
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (1, '0001_01_01_000000_create_users_table', 1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (2, '0001_01_01_000001_create_cache_table', 1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (3, '0001_01_01_000002_create_jobs_table', 1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (4, '2026_02_17_224454_add_approval_columns_to_pemeliharaan_barang_table', 2);
 COMMIT;
 
 -- ----------------------------
@@ -816,34 +817,43 @@ CREATE TABLE `pemeliharaan_barang` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `kode` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `gudang_id` bigint unsigned DEFAULT NULL,
-  `status` enum('baik','rusak','habis','diperbaiki') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'baik',
+  `status` enum('baik','rusak','habis','diperbaiki','pending','disetujui','ditolak','batal','selesai','diproses') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'baik',
   `tanggal` date NOT NULL,
+  `tanggal_selesai` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `biaya` decimal(15,2) DEFAULT '0.00',
   `petugas_id` bigint unsigned NOT NULL,
+  `alasan` text COLLATE utf8mb4_unicode_ci,
   `catatan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `approved_by` bigint unsigned DEFAULT NULL,
+  `tanggal_approval` timestamp NULL DEFAULT NULL,
+  `catatan_approval` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   UNIQUE KEY `kode_pemeliharaan` (`kode`),
   KEY `idx_kode` (`kode`),
   KEY `idx_tanggal` (`tanggal`),
   KEY `pemeliharaan_barang_ibfk_2` (`petugas_id`),
   KEY `idx_pemeliharaan_gudang` (`gudang_id`),
+  KEY `pemeliharaan_barang_approved_by_foreign` (`approved_by`),
+  CONSTRAINT `pemeliharaan_barang_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `pemeliharaan_barang_ibfk_2` FOREIGN KEY (`petugas_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `pemeliharaan_barang_ibfk_gudang` FOREIGN KEY (`gudang_id`) REFERENCES `gudang` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of pemeliharaan_barang
 -- ----------------------------
 BEGIN;
+INSERT INTO `pemeliharaan_barang` (`id`, `kode`, `gudang_id`, `status`, `tanggal`, `tanggal_selesai`, `biaya`, `petugas_id`, `alasan`, `catatan`, `created_at`, `updated_at`, `approved_by`, `tanggal_approval`, `catatan_approval`) VALUES (5, 'MTN/202602/0005', 1, 'pending', '2026-02-18', NULL, 0.00, 1, NULL, NULL, '2026-02-17 22:21:45', '2026-02-17 22:21:45', NULL, NULL, NULL);
+INSERT INTO `pemeliharaan_barang` (`id`, `kode`, `gudang_id`, `status`, `tanggal`, `tanggal_selesai`, `biaya`, `petugas_id`, `alasan`, `catatan`, `created_at`, `updated_at`, `approved_by`, `tanggal_approval`, `catatan_approval`) VALUES (6, 'MTN/202602/0002', 2, 'diproses', '2026-02-18', NULL, 0.00, 1, NULL, NULL, '2026-02-17 22:25:58', '2026-02-17 22:53:02', 1, '2026-02-17 22:49:38', 'test123');
 COMMIT;
 
 -- ----------------------------
--- Table structure for pemeliharaan_barang_detaill
+-- Table structure for pemeliharaan_barang_detail
 -- ----------------------------
-DROP TABLE IF EXISTS `pemeliharaan_barang_detaill`;
-CREATE TABLE `pemeliharaan_barang_detaill` (
+DROP TABLE IF EXISTS `pemeliharaan_barang_detail`;
+CREATE TABLE `pemeliharaan_barang_detail` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `pemeliharaan_id` bigint unsigned DEFAULT NULL,
   `barang_id` bigint unsigned DEFAULT NULL,
@@ -856,12 +866,14 @@ CREATE TABLE `pemeliharaan_barang_detaill` (
   KEY `pemeliharaan_barang_detail_ibfk_2` (`barang_id`),
   CONSTRAINT `pemeliharaan_barang_detail_ibfk_1` FOREIGN KEY (`pemeliharaan_id`) REFERENCES `pemeliharaan_barang` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `pemeliharaan_barang_detail_ibfk_2` FOREIGN KEY (`barang_id`) REFERENCES `barang` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
--- Records of pemeliharaan_barang_detaill
+-- Records of pemeliharaan_barang_detail
 -- ----------------------------
 BEGIN;
+INSERT INTO `pemeliharaan_barang_detail` (`id`, `pemeliharaan_id`, `barang_id`, `jml`, `keterangan`, `created_at`, `updated_at`) VALUES (2, 5, 1004, 2, NULL, '2026-02-17 22:21:45', '2026-02-17 22:21:45');
+INSERT INTO `pemeliharaan_barang_detail` (`id`, `pemeliharaan_id`, `barang_id`, `jml`, `keterangan`, `created_at`, `updated_at`) VALUES (3, 6, 2045, 2, NULL, '2026-02-17 22:25:58', '2026-02-17 22:25:58');
 COMMIT;
 
 -- ----------------------------
@@ -896,7 +908,7 @@ CREATE TABLE `pencatatan_barang` (
   CONSTRAINT `pencatatan_barang_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `pencatatan_barang_ibfk_4` FOREIGN KEY (`permintaan_id`) REFERENCES `permintaan_barang` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `pencatatan_barang_ibfk_gudang` FOREIGN KEY (`gudang_id`) REFERENCES `gudang` (`id`) ON DELETE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of pencatatan_barang
@@ -959,7 +971,7 @@ CREATE TABLE `permintaan_barang` (
   KEY `idx_tanggal` (`tanggal`),
   CONSTRAINT `permintaan_barang_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `permintaan_barang_ibfk_2` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of permintaan_barang
@@ -968,6 +980,8 @@ BEGIN;
 INSERT INTO `permintaan_barang` (`id`, `kode`, `user_id`, `tanggal`, `alasan`, `status`, `approved_by`, `tanggal_approval`, `catatan_approval`, `created_at`, `updated_at`) VALUES (1, 'REQ/202601/0001', 1, '2026-01-25', 'eqwe', 'ditolak', NULL, '2026-01-25 08:18:59', NULL, '2026-01-25 05:35:19', '2026-01-25 08:18:59');
 INSERT INTO `permintaan_barang` (`id`, `kode`, `user_id`, `tanggal`, `alasan`, `status`, `approved_by`, `tanggal_approval`, `catatan_approval`, `created_at`, `updated_at`) VALUES (2, 'REQ/202601/0002', 1, '2026-01-25', 'test', 'disetujui', NULL, '2026-01-25 08:23:04', NULL, '2026-01-25 05:35:55', '2026-01-25 08:23:04');
 INSERT INTO `permintaan_barang` (`id`, `kode`, `user_id`, `tanggal`, `alasan`, `status`, `approved_by`, `tanggal_approval`, `catatan_approval`, `created_at`, `updated_at`) VALUES (3, 'REQ/202601/0003', 1, '2026-01-25', 'ter', 'selesai', NULL, '2026-01-25 15:17:34', NULL, '2026-01-25 15:17:15', '2026-01-25 15:18:10');
+INSERT INTO `permintaan_barang` (`id`, `kode`, `user_id`, `tanggal`, `alasan`, `status`, `approved_by`, `tanggal_approval`, `catatan_approval`, `created_at`, `updated_at`) VALUES (4, 'REQ/202602/0004', 1, '2026-02-11', NULL, 'ditolak', NULL, '2026-02-11 07:15:25', 'tidak usah ngajuin', '2026-02-11 07:15:04', '2026-02-11 07:15:25');
+INSERT INTO `permintaan_barang` (`id`, `kode`, `user_id`, `tanggal`, `alasan`, `status`, `approved_by`, `tanggal_approval`, `catatan_approval`, `created_at`, `updated_at`) VALUES (5, 'REQ/202602/0005', 1, '2026-02-11', 'a', 'disetujui', NULL, '2026-02-11 07:16:14', 'Iya', '2026-02-11 07:16:07', '2026-02-11 07:16:14');
 COMMIT;
 
 -- ----------------------------
@@ -988,12 +1002,16 @@ CREATE TABLE `permintaan_barang_detail` (
   KEY `permintaan_barang_detail_ibfk_2` (`barang_id`),
   CONSTRAINT `permintaan_barang_detail_ibfk_1` FOREIGN KEY (`permintaan_id`) REFERENCES `permintaan_barang` (`id`) ON DELETE CASCADE,
   CONSTRAINT `permintaan_barang_detail_ibfk_2` FOREIGN KEY (`barang_id`) REFERENCES `barang` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of permintaan_barang_detail
 -- ----------------------------
 BEGIN;
+INSERT INTO `permintaan_barang_detail` (`id`, `permintaan_id`, `barang_id`, `jml`, `jml_approval`, `catatan`, `created_at`, `updated_at`) VALUES (4, 4, 2110, 20, 0, NULL, '2026-02-11 07:15:04', '2026-02-11 07:15:04');
+INSERT INTO `permintaan_barang_detail` (`id`, `permintaan_id`, `barang_id`, `jml`, `jml_approval`, `catatan`, `created_at`, `updated_at`) VALUES (5, 4, 1957, 3, 0, NULL, '2026-02-11 07:15:04', '2026-02-11 07:15:04');
+INSERT INTO `permintaan_barang_detail` (`id`, `permintaan_id`, `barang_id`, `jml`, `jml_approval`, `catatan`, `created_at`, `updated_at`) VALUES (6, 5, 2110, 2, 0, NULL, '2026-02-11 07:16:07', '2026-02-11 07:16:07');
+INSERT INTO `permintaan_barang_detail` (`id`, `permintaan_id`, `barang_id`, `jml`, `jml_approval`, `catatan`, `created_at`, `updated_at`) VALUES (7, 5, 1907, 3, 0, NULL, '2026-02-11 07:16:07', '2026-02-11 07:16:07');
 COMMIT;
 
 -- ----------------------------
@@ -1054,7 +1072,7 @@ CREATE TABLE `sessions` (
 -- Records of sessions
 -- ----------------------------
 BEGIN;
-INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES ('bu7Vl9zEXmW3LXW15QYBrhtfCgak8VC3j2K9WAx1', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoibnQ5cFlZZ0h6YllYSFh6UWxoVGdNeVJWYkNjNjhJVmM0UlF3V01yTiI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjI6e3M6MzoidXJsIjtzOjI4OiJodHRwOi8vbG9naXN0aWsudGVzdC9sYXBvcmFuIjtzOjU6InJvdXRlIjtzOjEzOiJsYXBvcmFuLmluZGV4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1770311352);
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES ('FWMImkhzXJOxYvEjwbhlQPwdhrvKax5feHvlgcyO', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoib1dRRFdETDNIUGFkekFqZE9GOHl3RWlvR0dOZUJyY3M1dXNTVHY3aiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly9sb2dpc3Rpay50ZXN0L3BlbWVsaWhhcmFhbi1iYXJhbmciO3M6NToicm91dGUiO3M6MjU6InBlbWVsaWhhcmFhbi1iYXJhbmcuaW5kZXgiO31zOjM6InVybCI7YTowOnt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1771369045);
 COMMIT;
 
 -- ----------------------------
@@ -1077,13 +1095,14 @@ CREATE TABLE `stok_gudang` (
   KEY `idx_barang_id` (`barang_id`),
   CONSTRAINT `stok_gudang_ibfk_1` FOREIGN KEY (`gudang_id`) REFERENCES `gudang` (`id`) ON DELETE CASCADE,
   CONSTRAINT `stok_gudang_ibfk_2` FOREIGN KEY (`barang_id`) REFERENCES `barang` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of stok_gudang
 -- ----------------------------
 BEGIN;
-INSERT INTO `stok_gudang` (`id`, `gudang_id`, `barang_id`, `stok_tersedia`, `stok_minimum`, `stok_maksimum`, `lokasi_rak`, `created_at`, `updated_at`) VALUES (1, 1, 1418, 21, 0, 0, NULL, '2026-02-05 16:48:17', '2026-02-05 16:48:17');
+INSERT INTO `stok_gudang` (`id`, `gudang_id`, `barang_id`, `stok_tersedia`, `stok_minimum`, `stok_maksimum`, `lokasi_rak`, `created_at`, `updated_at`) VALUES (1, 1, 1418, 1, 0, 0, NULL, '2026-02-05 16:48:17', '2026-02-05 17:23:33');
+INSERT INTO `stok_gudang` (`id`, `gudang_id`, `barang_id`, `stok_tersedia`, `stok_minimum`, `stok_maksimum`, `lokasi_rak`, `created_at`, `updated_at`) VALUES (2, 2, 1418, 20, 0, 0, NULL, '2026-02-05 17:23:35', '2026-02-05 17:23:35');
 COMMIT;
 
 -- ----------------------------
@@ -1104,7 +1123,7 @@ CREATE TABLE `suppliers` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `kode_supplier` (`kode_supplier`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of suppliers
@@ -1112,6 +1131,11 @@ CREATE TABLE `suppliers` (
 BEGIN;
 INSERT INTO `suppliers` (`id`, `kode_supplier`, `nama_supplier`, `alamat`, `no_telepon`, `email`, `kontak_person`, `is_active`, `created_at`, `updated_at`, `deleted_at`) VALUES (1, 'sad', 'sad', 'sadasd', '21214', 'sad@gmail.com', 'sad', 1, '2025-11-18 22:11:09', '2025-11-19 03:39:54', '2025-11-19 03:39:54');
 INSERT INTO `suppliers` (`id`, `kode_supplier`, `nama_supplier`, `alamat`, `no_telepon`, `email`, `kontak_person`, `is_active`, `created_at`, `updated_at`, `deleted_at`) VALUES (2, 'SUPP-01', 'Supplier 1', 'sad', 'SAD', 'SA@gmail.com', 'asdkd', 1, '2025-11-25 04:13:11', '2025-11-25 04:13:11', NULL);
+INSERT INTO `suppliers` (`id`, `kode_supplier`, `nama_supplier`, `alamat`, `no_telepon`, `email`, `kontak_person`, `is_active`, `created_at`, `updated_at`, `deleted_at`) VALUES (10, 'SUP-001', 'PT. Logistik Jaya', 'Jl. Merdeka No. 10, Jakarta', '021-1234567', 'contact@logistikjaya.com', 'Budi Santoso', 1, '2026-02-06 00:22:18', '2026-02-06 00:22:18', NULL);
+INSERT INTO `suppliers` (`id`, `kode_supplier`, `nama_supplier`, `alamat`, `no_telepon`, `email`, `kontak_person`, `is_active`, `created_at`, `updated_at`, `deleted_at`) VALUES (11, 'SUP-002', 'CV. Sumber Makmur', 'Jl. Sudirman No. 45, Bandung', '022-9876543', 'sales@sumbermakmur.co.id', 'Siti Aminah', 1, '2026-02-06 00:22:18', '2026-02-06 00:22:18', NULL);
+INSERT INTO `suppliers` (`id`, `kode_supplier`, `nama_supplier`, `alamat`, `no_telepon`, `email`, `kontak_person`, `is_active`, `created_at`, `updated_at`, `deleted_at`) VALUES (12, 'SUP-003', 'UD. Maju Bersama', 'Jl. Ahmad Yani No. 88, Surabaya', '031-5551234', 'info@majubersama.com', 'Rudi Hartono', 1, '2026-02-06 00:22:18', '2026-02-06 00:22:18', NULL);
+INSERT INTO `suppliers` (`id`, `kode_supplier`, `nama_supplier`, `alamat`, `no_telepon`, `email`, `kontak_person`, `is_active`, `created_at`, `updated_at`, `deleted_at`) VALUES (13, 'SUP-004', 'PT. Teknindo Abadi', 'Jl. Gatot Subroto No. 12, Medan', '061-7778888', 'support@teknindo.com', 'Dewi Lestari', 1, '2026-02-06 00:22:18', '2026-02-06 00:22:18', NULL);
+INSERT INTO `suppliers` (`id`, `kode_supplier`, `nama_supplier`, `alamat`, `no_telepon`, `email`, `kontak_person`, `is_active`, `created_at`, `updated_at`, `deleted_at`) VALUES (14, 'SUP-005', 'CV. Berkah Alam', 'Jl. Diponegoro No. 5, Semarang', '024-3334444', 'admin@berkahalam.com', 'Agus Setiawan', 1, '2026-02-06 00:22:18', '2026-02-06 00:22:18', NULL);
 COMMIT;
 
 -- ----------------------------
@@ -1144,12 +1168,13 @@ CREATE TABLE `transfer_barang` (
   CONSTRAINT `transfer_barang_ibfk_2` FOREIGN KEY (`gudang_asal_id`) REFERENCES `gudang` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `transfer_barang_ibfk_3` FOREIGN KEY (`gudang_tujuan_id`) REFERENCES `gudang` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `transfer_barang_ibfk_4` FOREIGN KEY (`diterima_oleh`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of transfer_barang
 -- ----------------------------
 BEGIN;
+INSERT INTO `transfer_barang` (`id`, `kode`, `tanggal`, `gudang_asal_id`, `gudang_tujuan_id`, `status`, `user_id`, `diterima_oleh`, `tanggal_diterima`, `catatan`, `created_at`, `updated_at`) VALUES (1, 'TRF-YO7SHL24UU', '2026-02-06', 1, 2, 'diterima', 1, 1, '2026-02-05 17:23:35', NULL, '2026-02-05 17:23:27', '2026-02-05 17:23:35');
 COMMIT;
 
 -- ----------------------------
@@ -1171,12 +1196,13 @@ CREATE TABLE `transfer_barang_detail` (
   KEY `idx_barang_id` (`barang_id`),
   CONSTRAINT `transfer_barang_detail_ibfk_1` FOREIGN KEY (`transfer_id`) REFERENCES `transfer_barang` (`id`) ON DELETE CASCADE,
   CONSTRAINT `transfer_barang_detail_ibfk_2` FOREIGN KEY (`barang_id`) REFERENCES `barang` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of transfer_barang_detail
 -- ----------------------------
 BEGIN;
+INSERT INTO `transfer_barang_detail` (`id`, `transfer_id`, `barang_id`, `jml_kirim`, `jml_diterima`, `kondisi`, `keterangan`, `created_at`, `updated_at`) VALUES (1, 1, 1418, 20, 20, 'baik', NULL, '2026-02-05 17:23:27', '2026-02-05 17:23:35');
 COMMIT;
 
 -- ----------------------------
@@ -1204,7 +1230,7 @@ CREATE TABLE `users` (
 -- Records of users
 -- ----------------------------
 BEGIN;
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `role`, `gudang_id`) VALUES (1, 'Admin', 'admin@admin.com', '2025-11-16 15:34:56', '$2y$12$06z0Y9FQb/x84mmThZZy/./1iq4cI9vyRaI2g0awQQ8zDbh6Yq1/C', 'xQ37SwJYNdQj0uqFRLcgk4mGL4so1c7mzz4P3DbkKFaQ0trwQq4U8i9krwnt', '2025-11-16 15:34:56', '2025-11-16 15:34:56', 'Admin', NULL);
+INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `role`, `gudang_id`) VALUES (1, 'Admin', 'admin@admin.com', '2025-11-16 15:34:56', '$2y$12$06z0Y9FQb/x84mmThZZy/./1iq4cI9vyRaI2g0awQQ8zDbh6Yq1/C', 'xoiIsaLqw4eyySYWGvTI9uFKSvogkk9eQYkV14oJGM2sv1kpyYuyd6eCOZ1f', '2025-11-16 15:34:56', '2025-11-16 15:34:56', 'Admin', NULL);
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `role`, `gudang_id`) VALUES (3, 'Staf Gudang Logistik', 'staf_gudang@timah.com', NULL, '$2y$12$qkZVWQLvvHcUQLtvh3Pm9.H1CMPRy8FY8L4B0IMbI2uCCJbk5BIDa', NULL, '2026-01-25 15:24:34', '2026-01-25 15:24:34', 'Staf Gudang Logistik', NULL);
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `role`, `gudang_id`) VALUES (4, 'Gudang Logistik', 'gudang_logistik@timah.com', NULL, '$2y$12$XMs1IInP4U4iGnZeCTAzxuopAZxBeBq6hUmipifT/iSiyl5G80/va', NULL, '2026-01-25 15:25:03', '2026-01-25 15:25:03', 'Gudang Logistik', NULL);
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `role`, `gudang_id`) VALUES (5, 'Kabag Logistik', 'kabag_logistik@timah.com', NULL, '$2y$12$1K0M4W8pzA9hYE.nqkN1J.EL.GvR9uNzGxyJ3nlEsSgjYX4pKkgBO', NULL, '2026-01-25 15:25:28', '2026-01-25 15:25:28', 'Kabag Logistik', NULL);

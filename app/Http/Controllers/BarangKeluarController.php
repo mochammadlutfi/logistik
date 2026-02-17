@@ -66,7 +66,7 @@ class BarangKeluarController extends Controller
 
                 if (!$stokGudang || $stokGudang->stok_tersedia < $d['jml']) {
                     $barangName = \App\Models\Barang::find($d['barang_id'])->nama_barang ?? 'Unknown';
-                    throw new \Illuminate\Validation\ValidationException(\Illuminate\Support\Facades\Validator::make([], []), [
+                    throw \Illuminate\Validation\ValidationException::withMessages([
                         'detail' => "Stok tidak cukup untuk barang {$barangName} di gudang yang dipilih."
                     ]);
                 }

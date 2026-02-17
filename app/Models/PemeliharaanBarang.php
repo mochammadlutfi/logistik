@@ -21,6 +21,9 @@ class PemeliharaanBarang extends Model
         'biaya',
         'petugas_id',
         'catatan',
+        'approved_by',
+        'tanggal_approval',
+        'catatan_approval',
     ];
 
     protected function casts(): array
@@ -28,6 +31,7 @@ class PemeliharaanBarang extends Model
         return [
             'tanggal' => 'date',
             'biaya' => 'decimal:2',
+            'tanggal_approval' => 'datetime',
         ];
     }
 
@@ -39,5 +43,15 @@ class PemeliharaanBarang extends Model
     public function petugas()
     {
         return $this->belongsTo(User::class, 'petugas_id');
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function detail()
+    {
+        return $this->hasMany(PemeliharaanBarangDetail::class, 'pemeliharaan_id');
     }
 }
