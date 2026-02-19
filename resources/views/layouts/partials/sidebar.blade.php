@@ -27,17 +27,18 @@
                 <ul>
                     @if(in_array(auth()->user()->role, ['Admin', 'Staf Gudang Logistik']))
                     <li><a href="{{ url('/barang-masuk') }}"><i class="fa-solid fa-arrows-down-to-line mr-2"></i><span>Barang Masuk</span></a></li>
-                    <li><a href="{{ url('/barang-keluar') }}"><i class="fa-solid fa-arrows-up-to-line mr-2"></i><span>Barang Keluar</span></a></li>
-                    <li><a href="{{ route('transfer-barang.index') }}"><i class="fa-solid fa-right-left mr-2"></i><span>Transfer Barang</span></a></li>
                     @endif
-                    @if(in_array(auth()->user()->role, ['Admin', 'Gudang Logistik', 'Kabag Logistik']))
+                    @if(in_array(auth()->user()->role, ['Admin', 'Gudang Logistik']))
+                    <li><a href="{{ url('/barang-keluar') }}"><i class="fa-solid fa-arrows-up-to-line mr-2"></i><span>Barang Keluar</span></a></li>
+                    @endif
+                    @if(in_array(auth()->user()->role, ['Admin', 'Staf Gudang Logistik', 'Kabag Logistik']))
                     <li><a href="{{ url('/permintaan-barang') }}"><i class="fa-solid fa-hand-holding mr-2"></i><span>Permintaan Barang</span></a></li>
                     @endif
-                    @if(in_array(auth()->user()->role, ['Admin', 'Staf Gudang Logistik', 'Kabag Logistik', 'Gudang Logistik']))
+                    @if(in_array(auth()->user()->role, ['Admin', 'Gudang Logistik', 'Kabag Logistik']))
                     <li><a href="{{ url('/pemeliharaan-barang') }}"><i class="fa-solid fa-hand-holding-medical mr-2"></i><span>Pemeliharaan Barang</span></a></li>
                     @endif
                 </ul>
-                @if(in_array(auth()->user()->role, ['Admin', 'Kabag Logistik']))
+                @if(in_array(auth()->user()->role, ['Admin', 'Kabag Logistik', 'Staf Gudang Logistik']))
                 <h3 id="group-label-content-3">Laporan</h3>
                 <ul>
                     <li><a href="{{ route('laporan.index') }}"><i class="fa-solid fa-file-export mr-2"></i><span>Download Laporan</span></a></li>
