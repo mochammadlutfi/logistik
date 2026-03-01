@@ -40,7 +40,6 @@ class BarangKeluarController extends Controller
         // dd($request->all());
         $validated = $request->validate([
             'permintaan_id' => ['required', 'integer', 'exists:permintaan_barang,id'],
-            'gudang_id' => ['required', 'exists:gudang,id'],
             'tanggal' => ['required'],
             'sumber_barang' => ['nullable'],
             'tujuan_barang' => ['nullable'],
@@ -51,6 +50,7 @@ class BarangKeluarController extends Controller
             'detail.*.keterangan' => ['nullable', 'string']
         ]);
         
+        $validated['gudang_id'] = 1;
         $validated['kode'] = 'WH-OUT/' . date('Ym').'/' .str_pad(PencatatanBarang::where('jenis', 'keluar')->count() + 1, 4, '0', STR_PAD_LEFT);
         $validated['jenis'] = 'keluar';
         $validated['user_id'] = auth()->user()->id;

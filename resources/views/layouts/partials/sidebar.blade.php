@@ -20,7 +20,6 @@
                     <li><a href="{{ url('/kategori') }}"><i class="fa-solid fa-chart-area mr-2"></i><span>Kategori Barang</span></a></li>
                     <li><a href="{{ url('/satuan') }}"><i class="fa-regular fa-bell mr-2"></i><span>Satuan Barang</span></a></li>
                     <li><a href="{{ url('/supplier') }}"><i class="fa-solid fa-bolt mr-2"></i><span>Supplier</span></a></li>
-                    <li><a href="{{ route('gudang.index') }}"><i class="fa-solid fa-warehouse mr-2"></i><span>Gudang</span></a></li>
                 </ul>
                 @endif
                 <h3 id="group-label-content-2">Transaksi</h3>

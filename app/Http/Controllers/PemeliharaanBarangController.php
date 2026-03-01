@@ -37,14 +37,13 @@ class PemeliharaanBarangController extends Controller
         // dd($request->all());
         $validated = $request->validate([
             'tanggal' => ['required'],
-            'gudang_id' => ['required', 'exists:gudang,id'],
             'catatan' => ['nullable', 'string'],
             'biaya' => ['required', 'integer', 'min:0'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
             'detail.*.jml' => ['nullable', 'integer', 'min:0'],
             'detail.*.keterangan' => ['nullable', 'string']
         ]);
-        
+        $validated['gudang_id'] =1;
         $validated['kode'] = 'MTN/' . date('Ym').'/' .str_pad(PemeliharaanBarang::count() + 1, 4, '0', STR_PAD_LEFT);
         $validated['petugas_id'] = auth()->user()->id;
         $validated['status'] = 'pending';

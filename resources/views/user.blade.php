@@ -16,7 +16,6 @@
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gudang</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dibuat</th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -27,8 +26,7 @@
                             <td class="px-4 py-3 text-sm text-gray-900">{{ $item->name }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->email }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->role }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->gudang?->nama_gudang ?? '-' }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700 text-right">
+\                            <td class="px-4 py-3 text-sm text-gray-700 text-right">
                                 {{ $item->created_at->format('d/m/Y H:i') }}
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-700 text-right">
@@ -91,17 +89,6 @@
                             <option value="Kabag Logistik">Kabag Logistik</option>
                         </select>
                         @error('role')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="grid gap-3">
-                        <label for="gudang_id">Gudang</label>
-                        <select class="select w-full" name="gudang_id" id="gudang_id">
-                            <option value="">Tidak Ada Gudang</option>
-                            @foreach($gudangs as $g)
-                                <option value="{{ $g->id }}">{{ $g->nama_gudang }}</option>
-                            @endforeach
-                        </select>
-                        @error('gudang_id')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="grid gap-3">
@@ -170,17 +157,6 @@
                         </select>
                         @error('role')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                     </div>
-
-                    <div class="grid gap-3">
-                        <label for="edit_gudang_id">Gudang</label>
-                        <select class="select w-full" id="edit_gudang_id" name="gudang_id">
-                            <option value="">Tidak Ada Gudang</option>
-                            @foreach($gudangs as $g)
-                                <option value="{{ $g->id }}">{{ $g->nama_gudang }}</option>
-                            @endforeach
-                        </select>
-                        @error('gudang_id')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
-                    </div>
                     <div class="grid gap-3">
                         <label for="edit_password">Password</label>
                         <div x-data="{ showPassword: false }" class="relative">
@@ -225,7 +201,6 @@
             document.getElementById('edit_nama').value = btn.dataset.name || '';
             document.getElementById('edit_email').value = btn.dataset.email || '';
             document.getElementById('edit_role').value = btn.dataset.role || '';
-            document.getElementById('edit_gudang_id').value = btn.dataset.gudangId || '';
             const form = document.getElementById('form-edit-user');
             form.action = `{{ url('/user') }}/${id}`;
             document.getElementById('dialog-edit-user').showModal();

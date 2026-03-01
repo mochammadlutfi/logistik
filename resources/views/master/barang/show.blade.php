@@ -117,7 +117,7 @@
                      </div>
 
                      <!-- Right Col: Warehouse Stock -->
-                     <div class="lg:col-span-2">
+                     <!-- <div class="lg:col-span-2">
                         <h3 class="text-sm font-semibold text-gray-900 border-b pb-2 mb-4">Distribusi Stok Gudang</h3>
                         @if($item->gudang->count() > 0)
                             <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
@@ -151,7 +151,7 @@
                                 <p class="mt-2 text-sm text-gray-500">Belum ada data stok tersimpan di gudang manapun.</p>
                             </div>
                         @endif
-                     </div>
+                     </div> -->
                 </div>
             </div>
         </div>
