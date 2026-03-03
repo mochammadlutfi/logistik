@@ -105,38 +105,41 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="grid gap-3">
-                            <label for="stok_tersedia">Stok Tersedia</label>
-                            <input type="number" id="stok_tersedia" class="w-full" name="stok_tersedia"
-                                value="{{ old('stok_tersedia', $isEdit ? $item->stok_tersedia : 0) }}" min="0" />
+                            <label for="stok_total">Stok Tersedia</label>
+                            <input type="number" id="stok_total" class="w-full" name="stok_total"
+                                value="{{ old('stok_total', $isEdit ? $item->stok_total : 0) }}" min="0" />
+                            @error('stok_total')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
                             <label for="stok_minimum">Stok Minimum</label>
                             <input type="number" id="stok_minimum" class="w-full" name="stok_minimum"
                                 value="{{ old('stok_minimum', $isEdit ? $item->stok_minimum : 0) }}" min="0" />
+                            @error('stok_minimum')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
                             <label for="stok_maksimum">Stok Maksimum</label>
                             <input type="number" id="stok_maksimum" class="w-full" name="stok_maksimum"
                                 value="{{ old('stok_maksimum', $isEdit ? $item->stok_maksimum : 0) }}" min="0" />
+                            @error('stok_maksimum')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="grid gap-3">
                             <label for="harga_satuan">Harga Satuan</label>
                             <input type="number" step="0.01" id="harga_satuan" name="harga_satuan" value="{{ old('harga_satuan', $isEdit ? $item->harga_satuan : 0) }}" min="0" />
+                            @error('harga_satuan')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
                             <label for="lokasi_penyimpanan">Lokasi Penyimpanan</label>
                             <input type="text" id="lokasi_penyimpanan" name="lokasi_penyimpanan" value="{{ old('lokasi_penyimpanan', $isEdit ? $item->lokasi_penyimpanan : '') }}" />
+                            @error('lokasi_penyimpanan')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
-                            <label for="kondisi_fisik">Kondisi Fisik</label>
-                            <select id="kondisi_fisik" name="kondisi_fisik" class="w-full">
-                                @foreach (['baik','rusak','habis','diperbaiki'] as $opt)
-                                    <option value="{{ $opt }}" {{ old('kondisi_fisik', $isEdit ? $item->kondisi_fisik : 'baik') == $opt ? 'selected' : '' }}>{{ ucfirst($opt) }}</option>
-                                @endforeach
-                            </select>
-                            @error('kondisi_fisik')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
+                            <label class="label">
+                                <input type="checkbox" name="is_maintain" value="1" role="switch" class="input" {{ old('is_maintain', $isEdit ? $item->is_maintain : '0') == '1' ? 'checked' : '' }}>
+                                Pemeliharaan
+                            </label>
+                            @error('is_maintain')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
                             <label for="is_active">Status Aktif</label>
@@ -144,6 +147,7 @@
                                 <option value="1" {{ old('is_active', $isEdit ? $item->is_active : '1') == '1' ? 'selected' : '' }}>Aktif</option>
                                 <option value="0" {{ old('is_active', $isEdit ? $item->is_active : '0') == '0' ? 'selected' : '' }}>Nonaktif</option>
                             </select>
+                            @error('is_active')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -151,6 +155,7 @@
                     <div class="grid gap-3">
                         <label for="keterangan">Keterangan</label>
                         <textarea id="keterangan" name="keterangan">{{ old('keterangan', $isEdit ? $item->keterangan : '') }}</textarea>
+                        @error('keterangan')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                     </div>
                     <footer class="flex gap-2 justify-end mt-2">
                         <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Batal</button>

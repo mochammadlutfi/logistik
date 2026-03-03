@@ -39,7 +39,7 @@ class BarangController extends Controller
             'stok_total' => ['nullable', 'integer', 'min:0'],
             'harga_satuan' => ['nullable', 'numeric', 'min:0'],
             'lokasi_penyimpanan' => ['nullable', 'string', 'max:100'],
-            'kondisi_fisik' => ['required', Rule::in(['baik','rusak','habis','diperbaiki'])],
+            'is_maintain' => ['nullable', 'boolean'],
             'foto_barang' => ['nullable', 'string', 'max:255'],
             'keterangan' => ['nullable', 'string'],
             'is_active' => ['nullable', 'boolean'],
@@ -50,6 +50,7 @@ class BarangController extends Controller
         if (!array_key_exists('stok_total', $validated)) { $validated['stok_total'] = 0; }
         if (!array_key_exists('harga_satuan', $validated)) { $validated['harga_satuan'] = 0; }
         if (!array_key_exists('is_active', $validated)) { $validated['is_active'] = true; }
+        if (!array_key_exists('is_maintain', $validated)) { $validated['is_maintain'] = false; }
 
         Barang::create($validated);
         return redirect()->route('barang.index')->with('status', 'Barang berhasil dibuat');
@@ -82,12 +83,14 @@ class BarangController extends Controller
             'stok_total' => ['nullable', 'integer', 'min:0'],
             'harga_satuan' => ['nullable', 'numeric', 'min:0'],
             'lokasi_penyimpanan' => ['nullable', 'string', 'max:100'],
-            'kondisi_fisik' => ['required', Rule::in(['baik','rusak','habis','diperbaiki'])],
+            'is_maintain' => ['nullable', 'boolean'],
             'foto_barang' => ['nullable', 'string', 'max:255'],
             'keterangan' => ['nullable', 'string'],
             'is_active' => ['nullable', 'boolean'],
         ]);
-
+        
+        if (!array_key_exists('is_maintain', $validated)) { $validated['is_maintain'] = false; }
+        
         $barang->update($validated);
         return redirect()->route('barang.index')->with('status', 'Barang berhasil diperbarui');
     }

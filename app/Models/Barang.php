@@ -22,7 +22,7 @@ class Barang extends Model
         'stok_total',
         'harga_satuan',
         'lokasi_penyimpanan',
-        'kondisi_fisik',
+        'is_maintain',
         'foto_barang',
         'keterangan',
         'is_active',
@@ -31,6 +31,7 @@ class Barang extends Model
     protected function casts(): array
     {
         return [
+            'is_maintain' => 'boolean',
             'is_active' => 'boolean',
             'harga_satuan' => 'decimal:2',
             'stok_total' => 'integer',

@@ -44,6 +44,9 @@
                                             <a role="menuitem" href="{{ route('barang-masuk.show', $item->id) }}">
                                                 Detail
                                             </a>
+                                            <a role="menuitem" href="{{ route('barang-masuk.export-pdf', $item->id) }}">
+                                                Export PDF
+                                            </a>
                                             <a role="menuitem" href="{{ route('barang-masuk.edit', $item->id) }}">
                                                 Ubah
                                             </a>

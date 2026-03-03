@@ -18,7 +18,7 @@ class BarangKeluarController extends Controller
     {
         $items = PencatatanBarang::with([ 'detail' => function($query){
             $query->with(['barang']);
-        }, 'supplier'])
+        }, 'supplier', 'permintaan'])
         ->where('jenis', 'keluar')
         ->orderByDesc('created_at')->get();
 
@@ -29,8 +29,8 @@ class BarangKeluarController extends Controller
     public function create()
     {
         $isEdit = false;
-        $barang = Barang::orderBy('nama_barang')->get();
-        $permintaan = PermintaanBarang::orderBy('id', 'DESC')->where('status', 'disetujui')->get();
+        $barang = Barang::with('satuan')->orderBy('nama_barang')->get();
+        $permintaan = PermintaanBarang::where('status', 'disetujui')->orderBy('id', 'DESC')->get();
         $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
         return view('keluar.form', compact('isEdit', 'permintaan', 'barang', 'gudang'));
     }
@@ -47,7 +47,7 @@ class BarangKeluarController extends Controller
             'catatan' => ['nullable', 'string'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
             'detail.*.jml' => ['nullable', 'integer', 'min:0'],
-            'detail.*.keterangan' => ['nullable', 'string']
+            'detail.*.kondisi' => ['nullable', 'string']
         ]);
         
         $validated['gudang_id'] = 1;
@@ -74,7 +74,7 @@ class BarangKeluarController extends Controller
                 $data->detail()->create([
                     'barang_id' => $d['barang_id'],
                     'jml' => $d['jml'],
-                    'keterangan' => $d['keterangan'],
+                    'kondisi' => $d['kondisi'] ?? null,
                 ]);
 
                 // Update Stok
@@ -91,7 +91,7 @@ class BarangKeluarController extends Controller
     }
 
     public function show($id){
-        $item = PencatatanBarang::with(['supplier', 'detail' => function($q){
+        $item = PencatatanBarang::with(['supplier', 'permintaan', 'detail' => function($q){
             return $q->with(['barang']);
         }])->findOrFail($id);
         // dd($item->toArray());
@@ -101,14 +101,15 @@ class BarangKeluarController extends Controller
 
     public function edit($id){
         $isEdit = true;
-        $item = PencatatanBarang::with(['supplier', 'detail' => function($q){
+        $item = PencatatanBarang::with(['supplier', 'permintaan', 'detail' => function($q){
             $q->with(['barang']);
         }])->findOrFail($id);
-        $barang = Barang::orderBy('nama_barang')->get();
+        $barang = Barang::with('satuan')->orderBy('nama_barang')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
         $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
 
-        return view('keluar.form', compact('item', 'barang', 'suppliers', 'isEdit', 'gudang'));
+        $permintaan = PermintaanBarang::orderBy('id', 'DESC')->get();
+        return view('keluar.form', compact('item', 'barang', 'suppliers', 'isEdit', 'gudang', 'permintaan'));
     }
 
     public function update(Request $request, $id)
@@ -117,13 +118,14 @@ class BarangKeluarController extends Controller
         $barang = PencatatanBarang::findOrFail($id);
         $validated = $request->validate([
             'tanggal' => ['required'],
+            'permintaan_id' => ['required', 'integer', 'exists:permintaan_barang,id'],
             'sumber_barang' => ['nullable'],
             'tujuan_barang' => ['nullable'],
             'catatan' => ['nullable', 'string'],
             'detail.*.id' => ['nullable', 'integer', 'exists:pencatatan_barang_detail,id'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
             'detail.*.jml' => ['nullable', 'integer', 'min:0'],
-            'detail.*.keterangan' => ['nullable', 'string'],
+            'detail.*.kondisi' => ['nullable', 'string'],
             'detail_hapus' => ['nullable', 'string'],
         ]);
 
@@ -136,7 +138,7 @@ class BarangKeluarController extends Controller
             ],[
                 'barang_id' => $d['barang_id'],
                 'jml' => $d['jml'],
-                'keterangan' => $d['keterangan'],
+                'kondisi' => $d['kondisi'],
             ]);
         }
         // dd($validated['detail_hapus']);

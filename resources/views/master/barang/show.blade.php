@@ -67,91 +67,48 @@
 
             <!-- Content Body -->
             <div class="p-6 md:p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
-                     <!-- Left Col: Details -->
-                     <div class="lg:col-span-1 space-y-6">
+                <div class="space-y-6">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 border-b pb-2 mb-4">Informasi Barang</h3>
+                    <dl class="grid grid-cols-2 gap-4">
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-900 border-b pb-2 mb-4">Informasi Barang</h3>
-                            <dl class="space-y-4">
-                                <div>
-                                    <dt class="text-xs font-medium text-gray-500 uppercase">Kategori</dt>
-                                    <dd class="mt-1 text-sm font-medium text-gray-900">{{ $item->kategori->nama_kategori ?? '-' }}</dd>
-                                </div>
-                                <div>
-                                    <dt class="text-xs font-medium text-gray-500 uppercase">Kondisi Fisik</dt>
-                                    <dd class="mt-1">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                                            {{ $item->kondisi_fisik == 'baik' ? 'bg-green-100 text-green-800' : '' }}
-                                            {{ $item->kondisi_fisik == 'rusak' ? 'bg-red-100 text-red-800' : '' }}
-                                            {{ $item->kondisi_fisik == 'sedang' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                            {{ $item->kondisi_fisik == 'habis' ? 'bg-gray-100 text-gray-800' : '' }}
-                                        ">
-                                            {{ $item->kondisi_fisik }}
-                                        </span>
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-xs font-medium text-gray-500 uppercase">Lokasi Penyimpanan</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">{{ $item->lokasi_penyimpanan ?? '-' }}</dd>
-                                </div>
-                                <div>
-                                    <dt class="text-xs font-medium text-gray-500 uppercase">Batas Stok</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">
-                                        Min: {{ number_format($item->stok_minimum) }} / Max: {{ number_format($item->stok_maksimum) }}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-xs font-medium text-gray-500 uppercase">Keterangan</dt>
-                                    <dd class="mt-1 text-sm text-gray-600 leading-relaxed">{{ $item->keterangan ?? '-' }}</dd>
-                                </div>
-                            </dl>
+                            <dt class="text-xs font-medium text-gray-500 uppercase">Kategori</dt>
+                            <dd class="mt-1 text-sm font-medium text-gray-900">{{ $item->kategori->nama_kategori ?? '-' }}</dd>
                         </div>
-                        
-                        <!-- Timeline -->
-                        <div class="pt-4 border-t border-gray-100">
-                             <div class="flex items-center gap-2 text-xs text-gray-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span>Diperbarui {{ $item->updated_at->diffForHumans() }}</span>
-                            </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase">Pemeliharaan</dt>
+                            <dd class="mt-1">
+                                @if ($item->is_maintain)
+                                    <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-700">Ya</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs rounded bg-red-100 text-red-700">Tidak</span>
+                                @endif
+                            </dd>
                         </div>
-                     </div>
-
-                     <!-- Right Col: Warehouse Stock -->
-                     <!-- <div class="lg:col-span-2">
-                        <h3 class="text-sm font-semibold text-gray-900 border-b pb-2 mb-4">Distribusi Stok Gudang</h3>
-                        @if($item->gudang->count() > 0)
-                            <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-100">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gudang</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi Rak</th>
-                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        @foreach($item->gudang as $g)
-                                            <tr>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    {{ $g->nama_gudang }}
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
-                                                    {{ number_format($g->pivot->stok_tersedia) }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <div class="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
-                                <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-                                </svg>
-                                <p class="mt-2 text-sm text-gray-500">Belum ada data stok tersimpan di gudang manapun.</p>
-                            </div>
-                        @endif
-                     </div> -->
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase">Lokasi Penyimpanan</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ $item->lokasi_penyimpanan ?? '-' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase">Batas Stok</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                Min: {{ number_format($item->stok_minimum) }} / Max: {{ number_format($item->stok_maksimum) }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase">Keterangan</dt>
+                            <dd class="mt-1 text-sm text-gray-600 leading-relaxed">{{ $item->keterangan ?? '-' }}</dd>
+                        </div>
+                    </dl>
+                </div>
+                
+                <!-- Timeline -->
+                <div class="pt-4 border-t border-gray-100">
+                        <div class="flex items-center gap-2 text-xs text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Diperbarui {{ $item->updated_at->diffForHumans() }}</span>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>

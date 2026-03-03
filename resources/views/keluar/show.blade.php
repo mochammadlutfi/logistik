@@ -31,10 +31,14 @@
                     </div>
 
                     <div class="space-y-1">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">No Permintaan</p>
+                        <p class="text-base font-semibold text-gray-900">{{ $item->permintaan->kode ?? '-' }}</p>
+                    </div>
+
+                    <div class="space-y-1">
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Supplier</p>
                         <p class="text-base font-semibold text-gray-900">{{ $item->supplier->nama_supplier ?? '-' }}</p>
                     </div>
-
 
                     <div class="space-y-1">
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Sumber Barang</p>
@@ -62,7 +66,7 @@
                                         Jumlah
                                     </th>
                                     <th scope="col" class="px-6 py-3 font-medium">
-                                        Catatan
+                                        Kondisi
                                     </th>
                                 </tr>
                             </thead>
@@ -79,7 +83,7 @@
                                             {{ $d->jml ?? '0'}}
                                         </td>
                                         <td class="px-6 py-4">
-                                        {{ $d->keterangan  ?? '-'}}
+                                        {{ $d->kondisi  ?? '-'}}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -163,10 +167,10 @@
                     jumlah.id = `stok_minimum-${index}`;
                     jumlah.name = `detail[${index}][stok_minimum]`;
                 }
-                const catatan = row.querySelector('input[type="text"][name^="detail"][name$="[keterangan]"]');
+                const catatan = row.querySelector('input[type="text"][name^="detail"][name$="[kondisi]"]');
                 if (catatan) {
-                    catatan.id = `keterangan-${index}`;
-                    catatan.name = `detail[${index}][keterangan]`;
+                    catatan.id = `kondisi-${index}`;
+                    catatan.name = `detail[${index}][kondisi]`;
                 }
                 const delBtn = row.querySelector('button.btn-destructive');
                 if (delBtn) delBtn.setAttribute('onclick', 'removeRow(this)');
@@ -177,7 +181,7 @@
         function resetRowValues(row) {
             const hidden = row.querySelector('input[type="hidden"][name$="[barang_id]"]');
             const jumlah = row.querySelector('input[type="number"][name$="[stok_minimum]"]');
-            const catatan = row.querySelector('input[type="text"][name$="[keterangan]"]');
+            const catatan = row.querySelector('input[type="text"][name$="[kondisi]"]');
             const labelSpan = row.querySelector('.truncate');
             if (hidden) hidden.value = '';
             if (jumlah) jumlah.value = 0;

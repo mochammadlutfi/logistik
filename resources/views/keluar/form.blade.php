@@ -24,7 +24,7 @@
                             <label for="permintaan_id">No Permintaan</label>
                             <div id="select-permintaan" class="w-full select">
                                 <button type="button" class="btn-outline justify-between font-normal w-full" id="select-permintaan-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-permintaan-listbox">
-                                    <span class="truncate">{{ old('permintaan_id', $isEdit ? $item->permintaan_id : '') }}</span>
+                                    <span class="truncate">{{ old('permintaan_id', $isEdit ? $item->permintaan_id : '') ? ($permintaan->where('id', old('permintaan_id', $isEdit ? $item->permintaan_id : ''))->first()->kode ?? 'Pilih...') : 'Pilih...' }}</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0">
                                     <path d="m7 15 5 5 5-5" />
                                     <path d="m7 9 5-5 5 5" />
@@ -46,7 +46,8 @@
                                             Pilih
                                         </div>
                                         @foreach ($permintaan as $b)
-                                        <div id="select-permintaan-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-keywords="{{ $b->kode }}">
+                                        @php $isSelected = old('permintaan_id', $isEdit ? $item->permintaan_id : '') == $b->id; @endphp
+                                        <div id="select-permintaan-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-keywords="{{ $b->kode }}" {{ $isSelected ? 'aria-selected="true"' : '' }}>
                                             {{ $b->kode }}
                                         </div>
                                         @endforeach
@@ -99,7 +100,7 @@
                                                 <input type="hidden" name="detail[{{ $k }}][id]" value="{{ $d->id }}" />
                                                 <div id="select-barang-0" class="w-full select">
                                                     <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-0-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-0-listbox">
-                                                        <span class="truncate">{{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') ? $barang->where('id', old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : ''))->first()->nama_barang : 'Pilih...'  }}</span>
+                                                        <span class="truncate">{{ old('detail.'.$k.'.barang_id', $isEdit ? $d->barang_id : '') ? $barang->where('id', old('detail.'.$k.'.barang_id', $isEdit ? $d->barang_id : ''))->first()->nama_barang : 'Pilih...'  }}</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0">
                                                         <path d="m7 15 5 5 5-5" />
                                                         <path d="m7 9 5-5 5 5" />
@@ -118,7 +119,7 @@
                                                         <div role="group" aria-labelledby="group-label-select-barang-0">
                                                             <div role="heading" id="group-label-select-barang-0">Barang</div>
                                                             @foreach ($barang as $b)
-                                                            <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" {{ old('detail['.$k.'][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
+                                                            <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" {{ old('detail.'.$k.'.barang_id', $isEdit ? $d->barang_id : '') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
                                                                 {{ $b->nama_barang }}
                                                                 <span class="badge badge-secondary">{{ $b->satuan->nama_satuan }}</span>
                                                             </div>
@@ -130,15 +131,15 @@
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4" width="120px">
-                                                <span class="satuan-display text-sm">{{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') ? $barang->where('id', old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : ''))->first()->satuan->nama_satuan : '-' }}</span>
+                                                <span class="satuan-display text-sm">{{ old('detail.'.$k.'.barang_id', $isEdit ? $d->barang_id : '') ? $barang->where('id', old('detail.'.$k.'.barang_id', $isEdit ? $d->barang_id : ''))->first()->satuan->nama_satuan : '-' }}</span>
                                             </td>
                                             <td class="px-6 py-4" width="140px">
                                                 <input type="number" id="jml-{{ $k }}" class="w-full" name="detail[{{ $k }}][jml]"
                                                     value="{{ old('detail['.$k.'][jml]', $isEdit ? $d->jml : 0) }}" min="0" />
                                             </td>
                                             <td class="px-6 py-4">
-                                                <input type="text" id="keterangan-{{ $k }}" class="w-full" name="detail[{{ $k }}][keterangan]"
-                                                    value="{{ old('detail['.$k.'][keterangan]', $isEdit ? $d->keterangan : '') }}" />
+                                                <input type="text" id="kondisi-{{ $k }}" class="w-full" name="detail[{{ $k }}][kondisi]"
+                                                    value="{{ old('detail.'.$k.'.kondisi', $isEdit ? $d->kondisi : '') }}" />
                                             </td>
                                             <td class="px-6 py-4" width="100px">
                                                 <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
@@ -152,7 +153,7 @@
                                     <td scope="row" class="px-6 py-4" width="40%">
                                         <div id="select-barang-0" class="w-full select">
                                             <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-0-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-0-listbox">
-                                                <span class="truncate">{{ old('barang_id', $isEdit ? $item->barang_id : '') ? $barang->where('id', old('detail[0][barang_id]', $isEdit ? $item->barang_id : ''))->first()->nama_barang : 'Pilih...'  }}</span>
+                                                <span class="truncate">{{ old('detail.0.barang_id') ? $barang->where('id', old('detail.0.barang_id'))->first()->nama_barang : 'Pilih...'  }}</span>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0">
                                                 <path d="m7 15 5 5 5-5" />
                                                 <path d="m7 9 5-5 5 5" />
@@ -172,7 +173,7 @@
                                                     <div role="heading" id="group-label-select-barang-0">Barang</div>
 
                                                     @foreach ($barang as $b)
-                                                    <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" {{ old('detail[0][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
+                                                    <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" {{ old('detail.0.barang_id') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
                                                         {{ $b->nama_barang }}
                                                         <span class="text-xs text-muted-foreground">{{ $b->satuan->nama_satuan }}</span>
                                                     </div>
@@ -191,8 +192,8 @@
                                             value="{{ old('detail[0][jml]', $isEdit ? $item->jml : 0) }}" min="0" />
                                     </td>
                                     <td class="px-6 py-4">
-                                        <input type="text" id="keterangan-0" class="w-full" name="detail[0][keterangan]"
-                                            value="{{ old('detail[0][keterangan]', $isEdit ? $item->keterangan : '') }}" />
+                                        <input type="text" id="kondisi-0" class="w-full" name="detail[0][kondisi]"
+                                            value="{{ old('detail.0.kondisi') }}" />
                                     </td>
                                     <td class="px-6 py-4" width="100px">
                                         <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
@@ -218,7 +219,7 @@
 
                     <div class="grid gap-3">
                         <label for="keterangan">Keterangan</label>
-                        <textarea id="keterangan" name="keterangan">{{ old('keterangan', $isEdit ? $item->keterangan : '') }}</textarea>
+                        <textarea id="catatan" name="catatan">{{ old('catatan', $isEdit ? $item->catatan : '') }}</textarea>
                     </div>
                     <footer class="flex gap-2 justify-end mt-2">
                         <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Batal</button>
@@ -375,10 +376,10 @@
                     jumlah.id = `jml-${index}`;
                     jumlah.name = `detail[${index}][jml]`;
                 }
-                const catatan = row.querySelector('input[type="text"][name^="detail"][name$="[keterangan]"]');
-                if (catatan) {
-                    catatan.id = `keterangan-${index}`;
-                    catatan.name = `detail[${index}][keterangan]`;
+                const kondisi = row.querySelector('input[type="text"][name^="detail"][name$="[kondisi]"]');
+                if (kondisi) {
+                    kondisi.id = `kondisi-${index}`;
+                    kondisi.name = `detail[${index}][kondisi]`;
                 }
                 const delBtn = row.querySelector('button.btn-destructive');
                 if (delBtn) delBtn.setAttribute('onclick', 'removeRow(this)');
@@ -389,13 +390,13 @@
         function resetRowValues(row) {
             const hidden = row.querySelector('input[type="hidden"][name$="[barang_id]"]');
             const jumlah = row.querySelector('input[type="number"][name$="[jml]"]');
-            const catatan = row.querySelector('input[type="text"][name$="[keterangan]"]');
+            const kondisi = row.querySelector('input[type="text"][name$="[kondisi]"]');
             const idHidden = row.querySelector('input[type="hidden"][name$="[id]"]');
             const labelSpan = row.querySelector('.truncate');
             const satuanDisplay = row.querySelector('.satuan-display');
             if (hidden) hidden.value = '';
             if (jumlah) jumlah.value = 0;
-            if (catatan) catatan.value = '';
+            if (kondisi) kondisi.value = '';
             if (idHidden) idHidden.value = '';
             if (labelSpan) labelSpan.textContent = 'Pilih...';
             if (satuanDisplay) satuanDisplay.textContent = '-';
@@ -464,8 +465,8 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(response => response.json())
             .then(data => {
+                console.log('Permintaan detail data:', data);
                 if (data.success && data.data && data.data.detail) {
                     populateDetailTable(data.data.detail);
                 }
@@ -534,7 +535,7 @@
                         <input type="number" id="jml-${index}" class="w-full" name="detail[${index}][jml]" value="${detail.jml || 0}" min="0" />
                     </td>
                     <td class="px-6 py-4">
-                        <input type="text" id="keterangan-${index}" class="w-full" name="detail[${index}][keterangan]" value="${detail.keterangan || ''}" />
+                        <input type="text" id="kondisi-${index}" class="w-full" name="detail[${index}][kondisi]" value="${detail.kondisi || ''}" />
                     </td>
                     <td class="px-6 py-4" width="100px">
                         <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">

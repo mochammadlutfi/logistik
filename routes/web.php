@@ -52,9 +52,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('permintaan-barang', PermintaanBarangController::class);
     Route::put('permintaan-barang/{id}/status', [PermintaanBarangController::class, 'status'])->name('permintaan-barang.status');
     Route::get('permintaan-barang/{id}/detail', [PermintaanBarangController::class, 'getDetail'])->name('permintaan-barang.detail');
+    Route::get('barang-masuk/{id}/export-pdf', [BarangMasukController::class, 'exportPdf'])->name('barang-masuk.export-pdf');
     Route::resource('barang-masuk', BarangMasukController::class);
-    Route::resource('barang-keluar', BarangKeluarController::class);
     Route::get('barang-keluar/{id}/export-pdf', [BarangKeluarController::class, 'exportPdf'])->name('barang-keluar.export-pdf');
+    Route::resource('barang-keluar', BarangKeluarController::class);
     Route::resource('pemeliharaan-barang', PemeliharaanBarangController::class);
     Route::put('pemeliharaan-barang/{id}/status', [PemeliharaanBarangController::class, 'status'])->name('pemeliharaan-barang.status');
     

@@ -14,6 +14,7 @@ class PencatatanBarang extends Model
     protected $fillable = [
         'kode',
         'gudang_id',
+        'permintaan_id',
         'barang_id',
         'jenis',
         'jumlah',
@@ -51,5 +52,10 @@ class PencatatanBarang extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function permintaan()
+    {
+        return $this->belongsTo(PermintaanBarang::class, 'permintaan_id');
     }
 }

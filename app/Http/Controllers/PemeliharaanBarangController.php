@@ -27,7 +27,7 @@ class PemeliharaanBarangController extends Controller
     public function create()
     {
         $isEdit = false;
-        $barang = Barang::orderBy('nama_barang')->get();
+        $barang = Barang::where('is_maintain', true)->orderBy('nama_barang')->get();
         $gudang = Gudang::orderBy('nama_gudang')->get(); 
         return view('pemeliharaan.form', compact('isEdit', 'barang', 'gudang'));
     }
@@ -72,7 +72,7 @@ class PemeliharaanBarangController extends Controller
         $item = PemeliharaanBarang::with(['detail' => function($q){
             $q->with(['barang']);
         }])->findOrFail($id);
-        $barang = Barang::orderBy('nama_barang')->get();
+        $barang = Barang::where('is_maintain', true)->orderBy('nama_barang')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
         $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
 

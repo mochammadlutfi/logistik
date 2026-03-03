@@ -17,6 +17,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No Permintaan</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sumber</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Barang</th>
@@ -27,6 +28,7 @@
                     @foreach ($items as $item)
                         <tr>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ $item->kode }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ $item->permintaan->kode ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->sumber_barang }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->detail()->count() }}</td>

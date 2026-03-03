@@ -8,6 +8,7 @@ use App\Models\Barang;
 use App\Models\Gudang; // Added this line
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade\Pdf;
 use PDO;
 
 class BarangMasukController extends Controller
@@ -156,8 +157,21 @@ class BarangMasukController extends Controller
 
     public function destroy($id)
     {
-        $barang = PencatatanBarang::findOrFail($id);    
+        $barang = PencatatanBarang::findOrFail($id);
         $barang->delete();
         return redirect()->route('barang-masuk.index')->with('status', 'Barang berhasil dihapus');
+    }
+
+    public function exportPdf($id)
+    {
+        $item = PencatatanBarang::with(['supplier', 'user', 'detail' => function($q){
+            return $q->with(['barang.satuan', 'barang.kategori']);
+        }])->findOrFail($id);
+
+        $pdf = Pdf::loadView('masuk.pdf.reservation-slip', compact('item'));
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = 'reservation-slip-' . str_replace('/', '-', $item->kode) . '.pdf';
+        return $pdf->download($filename);
     }
 }

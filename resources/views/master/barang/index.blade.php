@@ -22,7 +22,7 @@
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Satuan</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kondisi</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pemeliharaan</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -36,7 +36,13 @@
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->satuan?->nama_satuan }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ number_format($item->total_stock) }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ number_format((float) $item->harga_satuan, 2, '.', ',') }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ ucfirst($item->kondisi_fisik) }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">
+                                @if ($item->is_maintain)
+                                    <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-700">Ya</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs rounded bg-red-100 text-red-700">Tidak</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-sm">
                                 @if ($item->is_active)
                                     <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-700">Aktif</span>
