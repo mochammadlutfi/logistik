@@ -111,58 +111,6 @@
                                             </td>
                                         </tr>
                                     @endforeach
-                                @elseif(!$isEdit && $barang->count() > 0)
-                                    @foreach ($barang as $k => $b)
-                                        <tr class="bg-neutral-primary border-b border-default">
-                                            <td scope="row" class="px-6 py-4" width="40%">
-                                                <div id="select-barang-{{ $k }}" class="w-full select">
-                                                    <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-{{ $k }}-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-{{ $k }}-listbox">
-                                                        <span class="truncate">{{ $b->nama_barang }}</span>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0">
-                                                        <path d="m7 15 5 5 5-5" />
-                                                        <path d="m7 9 5-5 5 5" />
-                                                        </svg>
-                                                    </button>
-                                                    <div id="select-barang-{{ $k }}-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
-                                                        <header>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
-                                                            <circle cx="11" cy="11" r="8" />
-                                                            <path d="m21 21-4.3-4.3" />
-                                                        </svg>
-                                                        <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-barang-{{ $k }}-listbox" aria-labelledby="select-barang-{{ $k }}-trigger" />
-                                                        </header>
-
-                                                        <div role="listbox" id="select-barang-{{ $k }}-listbox" aria-orientation="vertical" aria-labelledby="select-barang-{{ $k }}-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
-                                                        <div role="group" aria-labelledby="group-label-select-barang-{{ $k }}">
-                                                            <div role="heading" id="group-label-select-barang-{{ $k }}">Barang</div>
-                                                            @foreach ($barang as $opt)
-                                                            <div id="select-barang-{{ $k }}-option-{{ $opt->id }}" role="option" data-value="{{ $opt->id }}" data-satuan="{{ $opt->satuan->nama_satuan }}" {{ $b->id == $opt->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $opt->nama_barang }}">
-                                                                {{ $opt->nama_barang }}
-                                                                <span class="badge badge-secondary">{{ $opt->satuan->nama_satuan }}</span>
-                                                            </div>
-                                                            @endforeach
-                                                        </div>
-                                                        </div>
-                                                    </div>
-                                                    <input type="hidden" name="detail[{{ $k }}][barang_id]" value="{{ $b->id }}" />
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4" width="120px">
-                                                <span class="satuan-display text-sm">{{ $b->satuan->nama_satuan }}</span>
-                                            </td>
-                                            <td class="px-6 py-4" width="140px">
-                                                <input type="number" id="jml-{{ $k }}" class="w-full" name="detail[{{ $k }}][jml]" value="1" min="0" />
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                <input type="text" id="keterangan-{{ $k }}" class="w-full" name="detail[{{ $k }}][keterangan]" value="" />
-                                            </td>
-                                            <td class="px-6 py-4" width="100px">
-                                                <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
-                                                    <i class="fa-solid fa-close"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
                                 @else
                                 <tr class="bg-neutral-primary border-b border-default">
                                     <td scope="row" class="px-6 py-4" width="40%">
