@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\PermintaanBarang;
 use App\Models\Supplier;
 use App\Models\Barang;
-use App\Models\Gudang; // Added this line
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use PDO;
@@ -28,8 +27,7 @@ class PermintaanBarangController extends Controller
         $isEdit = false;
         $suppliers = Supplier::orderBy('nama_supplier')->get();
         $barang = Barang::orderBy('nama_barang')->get();
-        $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
-        return view('permintaan.form', compact('isEdit', 'suppliers', 'barang', 'gudang'));
+        return view('permintaan.form', compact('isEdit', 'suppliers', 'barang'));
     }
 
     public function store(Request $request)
@@ -76,9 +74,8 @@ class PermintaanBarangController extends Controller
         }])->findOrFail($id);
         $barang = Barang::orderBy('nama_barang')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
-        $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
 
-        return view('permintaan.form', compact('item', 'barang', 'suppliers', 'isEdit', 'gudang'));
+        return view('permintaan.form', compact('item', 'barang', 'suppliers', 'isEdit'));
     }
 
     public function update(Request $request, $id)

@@ -40,7 +40,7 @@ class BarangMasukController extends Controller
         // dd($request->all());
         $validated = $request->validate([
             'tanggal' => ['required'],
-            'supplier_id' => ['required', 'integer', 'exists:suppliers,id'],
+            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
             'sumber_barang' => ['nullable'],
             'tujuan_barang' => ['nullable'],
             'stok_tersedia' => ['nullable', 'integer', 'min:0'],
@@ -108,7 +108,7 @@ class BarangMasukController extends Controller
         $barang = PencatatanBarang::findOrFail($id);
         $validated = $request->validate([
             'tanggal' => ['required'],
-            'supplier_id' => ['required', 'integer', 'exists:suppliers,id'],
+            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
             'sumber_barang' => ['nullable'],
             'tujuan_barang' => ['nullable'],
             'stok_tersedia' => ['nullable', 'integer', 'min:0'],
