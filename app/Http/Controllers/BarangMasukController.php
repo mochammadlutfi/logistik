@@ -59,7 +59,8 @@ class BarangMasukController extends Controller
         ]);
         
         $validated['gudang_id'] = 1;
-        $validated['kode'] = 'WH-IN/' . date('Ym').'/' .str_pad(PencatatanBarang::where('jenis', 'masuk')->count() + 1, 4, '0', STR_PAD_LEFT);
+        $maxId = PencatatanBarang::where('jenis', 'masuk')->max('id') ?? 0;
+        $validated['kode'] = 'WH-IN/' . date('Ym').'/' . str_pad($maxId + 1, 4, '0', STR_PAD_LEFT);
         $validated['jenis'] = 'masuk';
         $validated['user_id'] = auth()->user()->id;
         

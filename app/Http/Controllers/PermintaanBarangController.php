@@ -44,7 +44,8 @@ class PermintaanBarangController extends Controller
             'detail.*.keterangan' => ['nullable', 'string']
         ]);
         
-        $validated['kode'] = 'REQ/' . date('Ym').'/' .str_pad(PermintaanBarang::count() + 1, 4, '0', STR_PAD_LEFT);
+        $maxId = PermintaanBarang::max('id') ?? 0;
+        $validated['kode'] = 'REQ/' . date('Ym').'/' . str_pad($maxId + 1, 4, '0', STR_PAD_LEFT);
         $validated['user_id']= auth()->user()->id;
         $data = PermintaanBarang::create($validated);
 
