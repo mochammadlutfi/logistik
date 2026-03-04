@@ -2,7 +2,7 @@
     <div class="p-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between gap-2 mb-6">
             <h1 class="text-xl font-semibold">
-                {{ $isEdit ? 'Ubah' : 'Tambah' }} Barang Masuk
+                {{ $isEdit ? 'Ubah' : 'Tambah' }} Monitoring Barang
             </h1>
         </div>
 
@@ -13,7 +13,7 @@
         <div class="rounded-lg border p-4">
 
             <section>
-                <form method="POST" action="{{ $isEdit ? route('barang-masuk.update', $item->id) : route('barang-masuk.store') }}" class="form grid gap-4">
+                <form method="POST" action="{{ $isEdit ? route('monitoring-barang.update', $item->id) : route('monitoring-barang.store') }}" class="form grid gap-4">
                     @csrf
                     @if($isEdit)
                     @method('PUT')
@@ -21,14 +21,15 @@
                     <input type="hidden" name="detail_hapus" id="detail_hapus" value="" />
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="grid gap-3">
-                            <label for="tanggal">Tanggal</label>
-                            <input type="text" class="datepicker" id="tanggal" name="tanggal" value="{{ old('tanggal', $isEdit ? $item->tanggal : '') }}"
+                            <label for="tanggal">Tanggal Monitoring</label>
+                            <input type="text" class="datepicker" id="tanggal" name="tanggal" value="{{ old('tanggal', $isEdit ? $item->tanggal->format('Y-m-d') : '') }}"
                                 autofocus />
                             @error('tanggal')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
-                            <label for="tujuan_barang">Tujuan Barang</label>
-                            <input type="text" id="tujuan_barang" name="tujuan_barang" value="{{ old('tujuan_barang', $isEdit ? $item->tujuan_barang : '') }}" />
+                            <label for="lokasi">Lokasi</label>
+                            <input type="text" id="lokasi" name="lokasi" value="{{ old('lokasi', $isEdit ? $item->lokasi : '') }}" />
+                            @error('lokasi')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     
@@ -37,52 +38,38 @@
                         <table class="w-full text-sm text-left rtl:text-right text-body">
                             <thead class="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 font-medium">
-                                        Barang
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 font-medium">
-                                        Satuan
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 font-medium">
-                                        Jumlah
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 font-medium">
-                                        Catatan
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 font-medium">
-                                        Aksi
-                                    </th>
+                                    <th scope="col" class="px-6 py-3 font-medium">Barang</th>
+                                    <th scope="col" class="px-6 py-3 font-medium">Satuan</th>
+                                    <th scope="col" class="px-6 py-3 font-medium">Stok</th>
+                                    <th scope="col" class="px-6 py-3 font-medium">Rusak Ringan</th>
+                                    <th scope="col" class="px-6 py-3 font-medium">Rusak Berat</th>
+                                    <th scope="col" class="px-6 py-3 font-medium">Baik</th>
+                                    <th scope="col" class="px-6 py-3 font-medium">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if($isEdit && $item->detail->count() > 0)
                                     @foreach ($item->detail as $k => $d)
                                         <tr class="bg-neutral-primary border-b border-default">
-                                            <td scope="row" class="px-6 py-4" width="40%">
+                                            <td scope="row" class="px-6 py-4" width="30%">
                                                 <input type="hidden" name="detail[{{ $k }}][id]" value="{{ $d->id }}" />
-                                                <div id="select-barang-0" class="w-full select">
-                                                    <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-0-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-0-listbox">
+                                                <div id="select-barang-{{ $k }}" class="w-full select">
+                                                    <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-{{ $k }}-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-{{ $k }}-listbox">
                                                         <span class="truncate">{{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') ? $barang->where('id', old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : ''))->first()->nama_barang : 'Pilih...'  }}</span>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0">
-                                                        <path d="m7 15 5 5 5-5" />
-                                                        <path d="m7 9 5-5 5 5" />
-                                                        </svg>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0"><path d="m7 15 5 5 5-5" /><path d="m7 9 5-5 5 5" /></svg>
                                                     </button>
-                                                    <div id="select-barang-0-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
+                                                    <div id="select-barang-{{ $k }}-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
                                                         <header>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
-                                                            <circle cx="11" cy="11" r="8" />
-                                                            <path d="m21 21-4.3-4.3" />
-                                                        </svg>
-                                                        <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-barang-0-listbox" aria-labelledby="select-barang-0-trigger" />
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                                                        <input type="text" class="w-full border-0 focus:border-0" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-barang-{{ $k }}-listbox" aria-labelledby="select-barang-{{ $k }}-trigger" />
                                                         </header>
 
-                                                        <div role="listbox" id="select-barang-0-listbox" aria-orientation="vertical" aria-labelledby="select-barang-0-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
-                                                        <div role="group" aria-labelledby="group-label-select-barang-0">
-                                                            <div role="heading" id="group-label-select-barang-0">Barang</div>
+                                                        <div role="listbox" id="select-barang-{{ $k }}-listbox" aria-orientation="vertical" aria-labelledby="select-barang-{{ $k }}-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
+                                                        <div role="group">
+                                                            <div role="heading">Barang</div>
 
                                                             @foreach ($barang as $b)
-                                                            <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" {{ old('detail['.$k.'][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
+                                                            <div id="select-barang-{{ $k }}-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" data-stok="{{ $b->stok_total }}" {{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
                                                                 {{ $b->nama_barang }}
                                                                 <span class="badge badge-secondary">{{ $b->satuan->nama_satuan }}</span>
                                                             </div>
@@ -93,18 +80,26 @@
                                                     <input type="hidden" name="detail[{{ $k }}][barang_id]" value="{{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') }}" />
                                                 </div>
                                             </td>
-                                            <td class="px-6 py-4" width="120px">
+                                            <td class="px-6 py-4" width="10%">
                                                 <span class="satuan-display text-sm">{{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') ? $barang->where('id', old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : ''))->first()->satuan->nama_satuan : '-' }}</span>
                                             </td>
-                                            <td class="px-6 py-4" width="140px">
-                                                <input type="number" id="jml-{{ $k }}" class="w-full" name="detail[{{ $k }}][jml]"
-                                                    value="{{ old('detail['.$k.'][jml]', $isEdit ? $d->jml : 0) }}" min="0" />
+                                            <td class="px-6 py-4" width="10%">
+                                                <input type="number" id="stok_sistem-{{ $k }}" class="w-full bg-gray-100 cursor-not-allowed border-0 text-center" readonly
+                                                    value="{{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') ? $barang->where('id', old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : ''))->first()->stok_total : 0 }}" />
                                             </td>
-                                            <td class="px-6 py-4">
-                                                <input type="text" id="keterangan-{{ $k }}" class="w-full" name="detail[{{ $k }}][keterangan]"
-                                                    value="{{ old('detail['.$k.'][keterangan]', $isEdit ? $d->keterangan : '') }}" />
+                                            <td class="px-6 py-4" width="15%">
+                                                <input type="number" id="rusak_ringan-{{ $k }}" class="w-full check-stok" name="detail[{{ $k }}][rusak_ringan]"
+                                                    value="{{ old('detail['.$k.'][rusak_ringan]', $isEdit ? $d->rusak_ringan : 0) }}" min="0" />
                                             </td>
-                                            <td class="px-6 py-4" width="100px">
+                                            <td class="px-6 py-4" width="15%">
+                                                <input type="number" id="rusak_berat-{{ $k }}" class="w-full check-stok" name="detail[{{ $k }}][rusak_berat]"
+                                                    value="{{ old('detail['.$k.'][rusak_berat]', $isEdit ? $d->rusak_berat : 0) }}" min="0" />
+                                            </td>
+                                            <td class="px-6 py-4" width="15%">
+                                                <input type="number" id="baik-{{ $k }}" class="w-full bg-gray-100 cursor-not-allowed text-center" name="detail[{{ $k }}][baik]" readonly
+                                                    value="{{ old('detail['.$k.'][baik]', $isEdit ? $d->baik : 0) }}" min="0" />
+                                            </td>
+                                            <td class="px-6 py-4" width="10%">
                                                 <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
                                                     <i class="fa-solid fa-close"></i>
                                                 </button>
@@ -113,30 +108,24 @@
                                     @endforeach
                                 @else
                                 <tr class="bg-neutral-primary border-b border-default">
-                                    <td scope="row" class="px-6 py-4" width="40%">
+                                    <td scope="row" class="px-6 py-4" width="30%">
                                         <div id="select-barang-0" class="w-full select">
                                             <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-0-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-0-listbox">
-                                                <span class="truncate">{{ old('barang_id', $isEdit ? $item->barang_id : '') ? $barang->where('id', old('detail[0][barang_id]', $isEdit ? $item->barang_id : ''))->first()->nama_barang : 'Pilih...'  }}</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0">
-                                                <path d="m7 15 5 5 5-5" />
-                                                <path d="m7 9 5-5 5 5" />
-                                                </svg>
+                                                <span class="truncate">{{ old('detail[0][barang_id]') ? $barang->where('id', old('detail[0][barang_id]'))->first()->nama_barang : 'Pilih...'  }}</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0"><path d="m7 15 5 5 5-5" /><path d="m7 9 5-5 5 5" /></svg>
                                             </button>
                                             <div id="select-barang-0-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
                                                 <header>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
-                                                    <circle cx="11" cy="11" r="8" />
-                                                    <path d="m21 21-4.3-4.3" />
-                                                </svg>
-                                                <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-barang-0-listbox" aria-labelledby="select-barang-0-trigger" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                                                <input type="text" class="w-full border-0 focus:border-0" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-barang-0-listbox" aria-labelledby="select-barang-0-trigger" />
                                                 </header>
 
                                                 <div role="listbox" id="select-barang-0-listbox" aria-orientation="vertical" aria-labelledby="select-barang-0-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
-                                                <div role="group" aria-labelledby="group-label-select-barang-0">
-                                                    <div role="heading" id="group-label-select-barang-0">Barang</div>
+                                                <div role="group">
+                                                    <div role="heading">Barang</div>
 
                                                     @foreach ($barang as $b)
-                                                    <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" {{ old('detail[0][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
+                                                    <div id="select-barang-0-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-satuan="{{ $b->satuan->nama_satuan }}" data-stok="{{ $b->stok_total }}" {{ old('detail[0][barang_id]') == $b->id ? 'aria-selected="true"' : '' }} data-keywords="{{ $b->nama_barang }}">
                                                         {{ $b->nama_barang }}
                                                         <span class="text-xs text-muted-foreground">{{ $b->satuan->nama_satuan }}</span>
                                                     </div>
@@ -144,21 +133,29 @@
                                                 </div>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="detail[0][barang_id]" value="{{ old('detail[0][barang_id]', $isEdit ? $item->barang_id : '') }}" />
+                                            <input type="hidden" name="detail[0][barang_id]" value="{{ old('detail[0][barang_id]') }}" />
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4" width="120px">
+                                    <td class="px-6 py-4" width="10%">
                                         <span class="satuan-display text-sm">-</span>
                                     </td>
-                                    <td class="px-6 py-4" width="140px">
-                                        <input type="number" id="jml-0" class="w-full" name="detail[0][jml]"
-                                            value="{{ old('detail[0][jml]', $isEdit ? $item->jml : 0) }}" min="0" />
+                                    <td class="px-6 py-4" width="10%">
+                                        <input type="number" id="stok_sistem-0" class="w-full bg-gray-100 cursor-not-allowed border-0 text-center" readonly
+                                            value="{{ old('detail[0][barang_id]') ? $barang->where('id', old('detail[0][barang_id]'))->first()->stok_total : 0 }}" />
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <input type="text" id="keterangan-0" class="w-full" name="detail[0][keterangan]"
-                                            value="{{ old('detail[0][keterangan]', $isEdit ? $item->keterangan : '') }}" />
+                                    <td class="px-6 py-4" width="15%">
+                                        <input type="number" id="rusak_ringan-0" class="w-full check-stok" name="detail[0][rusak_ringan]"
+                                            value="{{ old('detail[0][rusak_ringan]', 0) }}" min="0" />
                                     </td>
-                                    <td class="px-6 py-4" width="100px">
+                                    <td class="px-6 py-4" width="15%">
+                                        <input type="number" id="rusak_berat-0" class="w-full check-stok" name="detail[0][rusak_berat]"
+                                            value="{{ old('detail[0][rusak_berat]', 0) }}" min="0" />
+                                    </td>
+                                    <td class="px-6 py-4" width="15%">
+                                        <input type="number" id="baik-0" class="w-full bg-gray-100 cursor-not-allowed" name="detail[0][baik]" readonly
+                                            value="{{ old('detail[0][baik]', 0) }}" min="0" />
+                                    </td>
+                                    <td class="px-6 py-4" width="10%">
                                         <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
                                             <i class="fa-solid fa-close"></i>
                                         </button>
@@ -168,7 +165,7 @@
                             </tbody>
                             <tfoot class="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4">
+                                    <td colspan="6" class="px-6 py-4">
                                         <button type="button" class="btn-sm btn-primary w-full" onclick="addRow()">
                                             <i class="fa-solid fa-plus"></i>
                                             Tambah Barang
@@ -185,22 +182,16 @@
                         <textarea id="keterangan" name="keterangan">{{ old('keterangan', $isEdit ? $item->keterangan : '') }}</textarea>
                     </div>
                     <footer class="flex gap-2 justify-end mt-2">
-                        <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Batal</button>
+                        <button type="button" class="btn-outline" onclick="this.closest('dialog')?.close() || window.history.back()">Batal</button>
                         <button class="btn" type="submit">Simpan</button>
                     </footer>
                 </form>
             </section>
-            <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()" class="absolute top-3 right-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
-            </button>
         </div>
     </div>
     
     @push('scripts')
     <script>
-        // Custom select handler yang bekerja dengan row dinamis
-        // BasecoatUI CSS tetap digunakan, JavaScript custom untuk handle interaksi
-        
         document.addEventListener('click', function (e) {
             const trigger = e.target.closest('[id$="-trigger"]');
             if (trigger && trigger.closest('.select')) {
@@ -210,7 +201,6 @@
                 const popover = container.querySelector('[id$="-popover"]');
                 const isHidden = popover && popover.getAttribute('aria-hidden') !== 'false';
                 
-                // Close all other popovers first
                 document.querySelectorAll('.select [data-popover]').forEach(p => {
                     if (p !== popover) {
                         p.setAttribute('aria-hidden', 'true');
@@ -219,7 +209,6 @@
                 
                 if (popover) {
                     popover.setAttribute('aria-hidden', isHidden ? 'false' : 'true');
-                    // Focus on search input when opened
                     if (isHidden) {
                         const searchInput = popover.querySelector('input[role="combobox"]');
                         if (searchInput) {
@@ -240,28 +229,37 @@
                 if (labelSpan) labelSpan.textContent = option.textContent.trim();
                 if (hiddenInput) hiddenInput.value = option.dataset.value || '';
                 
-                // Update satuan display
                 const row = container.closest('tr');
                 if (row) {
                     const satuanDisplay = row.querySelector('.satuan-display');
-                    if (satuanDisplay) {
-                        satuanDisplay.textContent = option.dataset.satuan || '-';
+                    const stokDisplay = row.querySelector('input[id^="stok_sistem-"]');
+                    const baikInput = row.querySelector('input[id^="baik-"]');
+                    const rrInput = row.querySelector('input[id^="rusak_ringan-"]');
+                    const rbInput = row.querySelector('input[id^="rusak_berat-"]');
+
+                    if (satuanDisplay) satuanDisplay.textContent = option.dataset.satuan || '-';
+                    if (stokDisplay) stokDisplay.value = option.dataset.stok || 0;
+
+                    // Automatically set "Baik" to total stock and reset damage fields when a new item is selected
+                    if (baikInput && option.dataset.stok) {
+                        baikInput.value = option.dataset.stok;
+                    } else if (baikInput) {
+                        baikInput.value = 0;
                     }
+
+                    if (rrInput) rrInput.value = 0;
+                    if (rbInput) rbInput.value = 0;
                 }
                 
-                // Update aria-selected
                 container.querySelectorAll('[role="option"][aria-selected="true"]').forEach(el => el.removeAttribute('aria-selected'));
                 option.setAttribute('aria-selected', 'true');
                 
-                // Close popover
                 const popover = container.querySelector('[id$="-popover"]');
                 if (popover) popover.setAttribute('aria-hidden', 'true');
                 
-                // Clear search input
                 const searchInput = popover?.querySelector('input[role="combobox"]');
                 if (searchInput) {
                     searchInput.value = '';
-                    // Show all options again
                     const listbox = container.querySelector('[role="listbox"]');
                     if (listbox) {
                         listbox.querySelectorAll('[role="option"]').forEach(opt => {
@@ -272,13 +270,11 @@
                 return;
             }
 
-            // Close all popovers when clicking outside
             if (!e.target.closest('.select')) {
                 document.querySelectorAll('.select [data-popover]').forEach(p => p.setAttribute('aria-hidden', 'true'));
             }
         });
 
-        // Search functionality
         document.addEventListener('input', function (e) {
             const input = e.target.closest('input[role="combobox"]');
             if (!input) return;
@@ -298,10 +294,39 @@
             });
         });
 
-        // Keyboard navigation (escape to close)
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.select [data-popover]').forEach(p => p.setAttribute('aria-hidden', 'true'));
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('check-stok')) {
+                const row = e.target.closest('tr');
+                if(!row) return;
+
+                const stokInput = row.querySelector('input[id^="stok_sistem-"]');
+                const rrInput = row.querySelector('input[id^="rusak_ringan-"]');
+                const rbInput = row.querySelector('input[id^="rusak_berat-"]');
+                const baikInput = row.querySelector('input[id^="baik-"]');
+
+                if (stokInput && rrInput && rbInput && baikInput) {
+                    const stok = parseInt(stokInput.value) || 0;
+                    const rr = parseInt(rrInput.value) || 0;
+                    const rb = parseInt(rbInput.value) || 0;
+
+                    const damageTotal = rr + rb;
+
+                    if (damageTotal > stok) {
+                        alert(`Total kerusakan (${damageTotal}) melebihi stok sistem (${stok}).\nMohon periksa kembali input Anda.`);
+                        e.target.value = 0; // Reset typing
+                        const newRr = parseInt(rrInput.value) || 0;
+                        const newRb = parseInt(rbInput.value) || 0;
+                        baikInput.value = Math.max(0, stok - (newRr + newRb));
+                    } else {
+                        baikInput.value = Math.max(0, stok - damageTotal);
+                    }
+                }
             }
         });
 
@@ -315,6 +340,7 @@
                 const listbox = row.querySelector('[id$="-listbox"]');
                 const headerInput = row.querySelector('[aria-controls$="-listbox"]');
                 const labelSpan = row.querySelector('.truncate');
+                
                 if (selectContainer && selectContainer.id) selectContainer.id = `select-barang-${index}`;
                 if (trigger && trigger.id) trigger.id = `select-barang-${index}-trigger`;
                 if (popover && popover.id) popover.id = `select-barang-${index}-popover`;
@@ -323,36 +349,46 @@
                     headerInput.setAttribute('aria-controls', `select-barang-${index}-listbox`);
                     headerInput.setAttribute('aria-labelledby', `select-barang-${index}-trigger`);
                 }
+                
                 const hidden = row.querySelector('input[type="hidden"][name^="detail"][name$="[barang_id]"]');
                 if (hidden) hidden.name = `detail[${index}][barang_id]`;
+                
                 const idHidden = row.querySelector('input[type="hidden"][name^="detail"][name$="[id]"]');
                 if (idHidden) idHidden.name = `detail[${index}][id]`;
-                const jumlah = row.querySelector('input[type="number"][name^="detail"][name$="[jml]"]');
-                if (jumlah) {
-                    jumlah.id = `jml-${index}`;
-                    jumlah.name = `detail[${index}][jml]`;
-                }
-                const catatan = row.querySelector('input[type="text"][name^="detail"][name$="[keterangan]"]');
-                if (catatan) {
-                    catatan.id = `keterangan-${index}`;
-                    catatan.name = `detail[${index}][keterangan]`;
-                }
+                
+                const stokSistem = row.querySelector('input[type="number"][id^="stok_sistem-"]');
+                if (stokSistem) { stokSistem.id = `stok_sistem-${index}`; }
+
+                const baik = row.querySelector('input[type="number"][name^="detail"][name$="[baik]"]');
+                if (baik) { baik.id = `baik-${index}`; baik.name = `detail[${index}][baik]`; }
+                
+                const rRingan = row.querySelector('input[type="number"][name^="detail"][name$="[rusak_ringan]"]');
+                if (rRingan) { rRingan.id = `rusak_ringan-${index}`; rRingan.name = `detail[${index}][rusak_ringan]`; }
+                
+                const rBerat = row.querySelector('input[type="number"][name^="detail"][name$="[rusak_berat]"]');
+                if (rBerat) { rBerat.id = `rusak_berat-${index}`; rBerat.name = `detail[${index}][rusak_berat]`; }
+                
                 const delBtn = row.querySelector('button.btn-destructive');
                 if (delBtn) delBtn.setAttribute('onclick', 'removeRow(this)');
-                if (labelSpan && !hidden.value) labelSpan.textContent = 'Pilih...';
+                if (labelSpan && !hidden.value) labelSpan.textConten = 'Pilih...';
             });
         }
 
         function resetRowValues(row) {
             const hidden = row.querySelector('input[type="hidden"][name$="[barang_id]"]');
-            const jumlah = row.querySelector('input[type="number"][name$="[jml]"]');
-            const catatan = row.querySelector('input[type="text"][name$="[keterangan]"]');
+            const baik = row.querySelector('input[type="number"][name$="[baik]"]');
+            const stokSistem = row.querySelector('input[type="number"][id^="stok_sistem-"]');
+            const rRingan = row.querySelector('input[type="number"][name$="[rusak_ringan]"]');
+            const rBerat = row.querySelector('input[type="number"][name$="[rusak_berat]"]');
             const idHidden = row.querySelector('input[type="hidden"][name$="[id]"]');
             const labelSpan = row.querySelector('.truncate');
             const satuanDisplay = row.querySelector('.satuan-display');
+            
             if (hidden) hidden.value = '';
-            if (jumlah) jumlah.value = 0;
-            if (catatan) catatan.value = '';
+            if (baik) baik.value = 0;
+            if (stokSistem) stokSistem.value = 0;
+            if (rRingan) rRingan.value = 0;
+            if (rBerat) rBerat.value = 0;
             if (idHidden) idHidden.value = '';
             if (labelSpan) labelSpan.textContent = 'Pilih...';
             if (satuanDisplay) satuanDisplay.textContent = '-';
@@ -389,5 +425,4 @@
         }
     </script>
     @endpush
-
 </x-app-layout>

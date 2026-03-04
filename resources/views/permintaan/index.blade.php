@@ -86,6 +86,7 @@
                 paging: true,
                 searching: true,
                 ordering: true,
+                order: [],
                 pageLength: 10,
                 columnDefs: [ { orderable: false, targets: 3 } ],
                 language: {

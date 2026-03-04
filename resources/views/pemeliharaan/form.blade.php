@@ -19,7 +19,36 @@
                     @method('PUT')
                     @endif
                     <input type="hidden" name="detail_hapus" id="detail_hapus" value="" />
-                    <div class="grid grid-cols-2 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-3 md:grid-cols-3 gap-4">
+                        <div class="grid gap-3">
+                            <label for="monitoring_id">Sumber Monitoring (Opsional)</label>
+                            <div id="select-monitoring" class="w-full select">
+                                <button type="button" class="btn-outline justify-between font-normal w-full" id="select-monitoring-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-monitoring-listbox">
+                                    <span class="truncate">{{ old('monitoring_id', $isEdit ? $item->monitoring_id : '') ? ($monitoring->where('id', old('monitoring_id', $isEdit ? $item->monitoring_id : ''))->first()->kode ?? 'Pilih...') : 'Pilih...' }}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+                                </button>
+                                <div id="select-monitoring-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
+                                    <header>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                        <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-monitoring-listbox" aria-labelledby="select-monitoring-trigger" />
+                                    </header>
+                                    <div role="listbox" id="select-monitoring-listbox" aria-orientation="vertical" aria-labelledby="select-monitoring-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
+                                        <div role="group" aria-labelledby="group-label-select-monitoring">
+                                            <div role="heading" id="group-label-select-monitoring">Monitoring Barang</div>
+                                            <div id="select-monitoring-option-0" role="option" data-value="" data-keywords="Pilih">Pilih</div>
+                                            @foreach ($monitoring ?? [] as $m)
+                                            @php $isSelected = old('monitoring_id', $isEdit ? $item->monitoring_id : '') == $m->id; @endphp
+                                            <div id="select-monitoring-option-{{ $m->id }}" role="option" data-value="{{ $m->id }}" data-keywords="{{ $m->kode }}" {{ $isSelected ? 'aria-selected="true"' : '' }}>
+                                                {{ $m->kode }} - {{ \Carbon\Carbon::parse($m->tanggal)->format('d/m/Y') }}
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="monitoring_id" value="{{ old('monitoring_id', $isEdit ? $item->monitoring_id : '') }}" />
+                            </div>
+                            @error('monitoring_id')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
+                        </div>
                         <div class="grid gap-3">
                             <label for="tanggal">Tanggal</label>
                             <input type="text" class="datepicker" id="tanggal" name="tanggal" value="{{ old('tanggal', $isEdit ? $item->tanggal : '') }}"
@@ -45,7 +74,10 @@
                                         Satuan
                                     </th>
                                     <th scope="col" class="px-6 py-3 font-medium">
-                                        Jumlah
+                                        Rusak Ringan
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 font-medium">
+                                        Rusak Berat
                                     </th>
                                     <th scope="col" class="px-6 py-3 font-medium">
                                         Catatan
@@ -97,8 +129,12 @@
                                                 <span class="satuan-display text-sm">{{ old('detail['.$k.'][barang_id]', $d->barang_id) ? ($barang->where('id', old('detail['.$k.'][barang_id]', $d->barang_id))->first()?->satuan->nama_satuan ?? '-') : '-' }}</span>
                                             </td>
                                             <td class="px-6 py-4" width="140px">
-                                                <input type="number" id="jml-{{ $k }}" class="w-full" name="detail[{{ $k }}][jml]"
-                                                    value="{{ old('detail['.$k.'][jml]', $d->jml) }}" min="0" />
+                                                <input type="number" id="rusak_ringan-{{ $k }}" class="w-full" name="detail[{{ $k }}][rusak_ringan]" value="{{ old('detail.'.$k.'.rusak_ringan', $d->rusak_ringan ?? 0) }}" min="0" max="{{ $d->barang->stok ?? 0 }}" />
+                                                @error("detail.{$k}.rusak_ringan")<div class="text-red-600 text-xs mt-1">{{ $message }}</div>@enderror
+                                            </td>
+                                            <td class="px-6 py-4" width="140px">
+                                                <input type="number" id="rusak_berat-{{ $k }}" class="w-full" name="detail[{{ $k }}][rusak_berat]" value="{{ old('detail.'.$k.'.rusak_berat', $d->rusak_berat ?? 0) }}" min="0" max="{{ $d->barang->stok ?? 0 }}" />
+                                                @error("detail.{$k}.rusak_berat")<div class="text-red-600 text-xs mt-1">{{ $message }}</div>@enderror
                                             </td>
                                             <td class="px-6 py-4">
                                                 <input type="text" id="keterangan-{{ $k }}" class="w-full" name="detail[{{ $k }}][keterangan]"
@@ -151,7 +187,12 @@
                                         <span class="satuan-display text-sm">-</span>
                                     </td>
                                     <td class="px-6 py-4" width="140px">
-                                        <input type="number" id="jml-0" class="w-full" name="detail[0][jml]" value="0" min="0" />
+                                        <input type="number" id="rusak_ringan-0" class="w-full" name="detail[0][rusak_ringan]" value="0" min="0" />
+                                        @error("detail.0.rusak_ringan")<div class="text-red-600 text-xs mt-1">{{ $message }}</div>@enderror
+                                    </td>
+                                    <td class="px-6 py-4" width="140px">
+                                        <input type="number" id="rusak_berat-0" class="w-full" name="detail[0][rusak_berat]" value="0" min="0" />
+                                        @error("detail.0.rusak_berat")<div class="text-red-600 text-xs mt-1">{{ $message }}</div>@enderror
                                     </td>
                                     <td class="px-6 py-4">
                                         <input type="text" id="keterangan-0" class="w-full" name="detail[0][keterangan]" value="" />
@@ -164,16 +205,16 @@
                                 </tr>
                                 @endif
                             </tbody>
-                            <tfoot class="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
+                            <!-- <tfoot class="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4">
+                                    <td colspan="6" class="px-6 py-4">
                                         <button type="button" class="btn-sm btn-primary w-full" onclick="addRow()">
                                             <i class="fa-solid fa-plus"></i>
                                             Tambah Barang
                                         </button>
                                     </td>
                                 </tr>
-                            </tfoot>
+                            </tfoot> -->
                         </table>
                     </div>
 
@@ -234,10 +275,12 @@
                 const container = option.closest('.select');
                 const labelSpan = container.querySelector('.truncate');
                 const hiddenInput = container.querySelector('input[type="hidden"][name$="[barang_id]"]');
-                
+                const monitoringInput = container.querySelector('input[type="hidden"][name="monitoring_id"]');
+
                 if (labelSpan) labelSpan.textContent = option.textContent.trim();
                 if (hiddenInput) hiddenInput.value = option.dataset.value || '';
-                
+                if (monitoringInput) monitoringInput.value = option.dataset.value || '';
+
                 // Update satuan display
                 const row = container.closest('tr');
                 if (row) {
@@ -266,6 +309,11 @@
                             opt.style.display = '';
                         });
                     }
+                }
+
+                // Trigger fetch monitoring detail if monitoring_id is selected
+                if (monitoringInput && option.dataset.value) {
+                    fetchMonitoringDetail(option.dataset.value);
                 }
                 return;
             }
@@ -325,10 +373,15 @@
                 if (hidden) hidden.name = `detail[${index}][barang_id]`;
                 const idHidden = row.querySelector('input[type="hidden"][name^="detail"][name$="[id]"]');
                 if (idHidden) idHidden.name = `detail[${index}][id]`;
-                const jumlah = row.querySelector('input[type="number"][name^="detail"][name$="[jml]"]');
-                if (jumlah) {
-                    jumlah.id = `jml-${index}`;
-                    jumlah.name = `detail[${index}][jml]`;
+                const rusak_ringan = row.querySelector('input[type="number"][name^="detail"][name$="[rusak_ringan]"]');
+                if (rusak_ringan) {
+                    rusak_ringan.id = `rusak_ringan-${index}`;
+                    rusak_ringan.name = `detail[${index}][rusak_ringan]`;
+                }
+                const rusak_berat = row.querySelector('input[type="number"][name^="detail"][name$="[rusak_berat]"]');
+                if (rusak_berat) {
+                    rusak_berat.id = `rusak_berat-${index}`;
+                    rusak_berat.name = `detail[${index}][rusak_berat]`;
                 }
                 const catatan = row.querySelector('input[type="text"][name^="detail"][name$="[keterangan]"]');
                 if (catatan) {
@@ -343,13 +396,15 @@
 
         function resetRowValues(row) {
             const hidden = row.querySelector('input[type="hidden"][name$="[barang_id]"]');
-            const jumlah = row.querySelector('input[type="number"][name$="[jml]"]');
+            const rusak_ringan = row.querySelector('input[type="number"][name$="[rusak_ringan]"]');
+            const rusak_berat = row.querySelector('input[type="number"][name$="[rusak_berat]"]');
             const catatan = row.querySelector('input[type="text"][name$="[keterangan]"]');
             const idHidden = row.querySelector('input[type="hidden"][name$="[id]"]');
             const labelSpan = row.querySelector('.truncate');
             const satuanDisplay = row.querySelector('.satuan-display');
             if (hidden) hidden.value = '';
-            if (jumlah) jumlah.value = 0;
+            if (rusak_ringan) rusak_ringan.value = 0;
+            if (rusak_berat) rusak_berat.value = 0;
             if (catatan) catatan.value = '';
             if (idHidden) idHidden.value = '';
             if (labelSpan) labelSpan.textContent = 'Pilih...';
@@ -406,6 +461,106 @@
             }
             row.remove();
             reindexRows();
+        }
+
+        // Fetch monitoring detail and populate table
+        function fetchMonitoringDetail(monitoringId) {
+            if (!monitoringId) return;
+
+            fetch(`/monitoring-barang/${monitoringId}/detail`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Monitoring detail data:', data);
+                if (data.success && data.data && data.data.detail) {
+                    populateDetailTable(data.data.detail);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching monitoring detail:', error);
+            });
+        }
+
+        // Populate detail table with fetched data
+        function populateDetailTable(details) {
+            const tbody = document.querySelector('table tbody');
+            const barangData = @json($barang);
+
+            // Clear existing rows
+            tbody.innerHTML = '';
+
+            // Filter out items that are only 'baik' (we want to maintain damaged items)
+            const damagedDetails = details.filter(d => d.rusak_ringan > 0 || d.rusak_berat > 0);
+
+            if (damagedDetails.length === 0) {
+                alert('Tidak ada barang rusak (Rusak Ringan/Berat) pada detail monitoring ini.');
+                addRow();
+                return;
+            }
+
+            damagedDetails.forEach((detail, index) => {
+                const barangInfo = detail.barang;
+                const satuanNama = barangInfo && barangInfo.satuan ? barangInfo.satuan.nama_satuan : '';
+                const r_ringan = detail.rusak_ringan || 0;
+                const r_berat = detail.rusak_berat || 0;
+                const infoKerusakan = `Masuk perbaikan otomatis`;
+
+                const row = document.createElement('tr');
+                row.className = 'bg-neutral-primary border-b border-default';
+                row.innerHTML = `
+                    <td scope="row" class="px-6 py-4" width="40%">
+                        <div id="select-barang-${index}" class="w-full select">
+                            <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-${index}-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-${index}-listbox">
+                                <span class="truncate">${barangInfo ? barangInfo.nama_barang : 'Pilih...'}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+                            </button>
+                            <div id="select-barang-${index}-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
+                                <header>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-barang-${index}-listbox" aria-labelledby="select-barang-${index}-trigger" />
+                                </header>
+                                <div role="listbox" id="select-barang-${index}-listbox" aria-orientation="vertical" aria-labelledby="select-barang-${index}-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
+                                <div role="group" aria-labelledby="group-label-select-barang-${index}">
+                                    <div role="heading" id="group-label-select-barang-${index}">Barang</div>
+                                    ${barangData.map(b => `
+                                        <div id="select-barang-${index}-option-${b.id}" role="option" data-value="${b.id}" data-satuan="${b.satuan ? b.satuan.nama_satuan : ''}" ${detail.barang_id == b.id ? 'aria-selected="true"' : ''} data-keywords="${b.nama_barang}">
+                                            ${b.nama_barang}
+                                            <span class="badge badge-secondary">${b.satuan ? b.satuan.nama_satuan : ''}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="detail[${index}][barang_id]" value="${detail.barang_id}" />
+                        </div>
+                    </td>
+                    <td class="px-6 py-4" width="120px">
+                        <span class="satuan-display text-sm">${satuanNama || '-'}</span>
+                    </td>
+                    <td class="px-6 py-4" width="140px">
+                        <input type="number" id="rusak_ringan-${index}" class="w-full" name="detail[${index}][rusak_ringan]" value="${r_ringan}" min="0" max="${r_ringan}" />
+                        <div class="text-gray-400 text-xs mt-1">Maks: ${r_ringan}</div>
+                    </td>
+                    <td class="px-6 py-4" width="140px">
+                        <input type="number" id="rusak_berat-${index}" class="w-full" name="detail[${index}][rusak_berat]" value="${r_berat}" min="0" max="${r_berat}" />
+                        <div class="text-gray-400 text-xs mt-1">Maks: ${r_berat}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="text" id="keterangan-${index}" class="w-full" name="detail[${index}][keterangan]" value="${infoKerusakan}" />
+                    </td>
+                    <td class="px-6 py-4" width="100px">
+                        <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
+                            <i class="fa-solid fa-close"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
         }
     </script>
     @endpush

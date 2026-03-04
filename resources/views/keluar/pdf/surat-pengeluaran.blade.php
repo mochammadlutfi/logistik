@@ -159,7 +159,7 @@
         <div class="info-line">
             Dikirim dari <span>{{ $item->sumber_barang ?? '...................' }}</span>
             ke <span>{{ $item->tujuan_barang ?? '...................' }}</span>
-            dengan <span>.....................</span>
+            dengan <span>{{ $item->catatan ?? '.....................' }}</span>
         </div>
 
         <div style="font-size: 10px; margin-bottom: 5px;">
@@ -188,7 +188,7 @@
                         {{ $detail->barang->nama_barang ?? '-' }}<br>
                         <small>MN. {{ $detail->barang->kode_barang ?? '-' }}</small>
                     </td>
-                    <td class="left">{{ $detail->keterangan ?? '-' }}</td>
+                    <td class="left">{{ $detail->kondisi ?? '-' }}</td>
                 </tr>
                 @endforeach
                 @for($i = count($item->detail); $i < 5; $i++)

@@ -13,13 +13,13 @@ class PemeliharaanBarang extends Model
 
     protected $fillable = [
         'kode',
-        'gudang_id',
-        'jenis',
-        'deskripsi',
+        'monitoring_id',
         'status',
         'tanggal',
+        'tanggal_selesai',
         'biaya',
         'petugas_id',
+        'alasan',
         'catatan',
         'approved_by',
         'tanggal_approval',
@@ -35,11 +35,6 @@ class PemeliharaanBarang extends Model
         ];
     }
 
-    public function gudang()
-    {
-        return $this->belongsTo(Gudang::class, 'gudang_id');
-    }
-
     public function petugas()
     {
         return $this->belongsTo(User::class, 'petugas_id');
@@ -53,5 +48,10 @@ class PemeliharaanBarang extends Model
     public function detail()
     {
         return $this->hasMany(PemeliharaanBarangDetail::class, 'pemeliharaan_id');
+    }
+
+    public function monitoring()
+    {
+        return $this->belongsTo(MonitoringBarang::class, 'monitoring_id');
     }
 }

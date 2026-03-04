@@ -45,14 +45,7 @@ class Barang extends Model
 
     public function stokGudang()
     {
-        return $this->hasMany(StokGudang::class, 'barang_id');
-    }
-
-    public function gudang()
-    {
-        return $this->belongsToMany(Gudang::class, 'stok_gudang', 'barang_id', 'gudang_id')
-                    ->withPivot('stok_tersedia', 'stok_minimum', 'stok_maksimum', 'lokasi_rak')
-                    ->withTimestamps();
+        return $this->hasOne(StokGudang::class, 'barang_id');
     }
 
     public function kategori()

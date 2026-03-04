@@ -13,7 +13,6 @@ class PencatatanBarang extends Model
 
     protected $fillable = [
         'kode',
-        'gudang_id',
         'permintaan_id',
         'barang_id',
         'jenis',
@@ -32,11 +31,6 @@ class PencatatanBarang extends Model
         return [
             'tanggal' => 'date',
         ];
-    }
-
-    public function gudang()
-    {
-        return $this->belongsTo(Gudang::class, 'gudang_id');
     }
 
     public function detail()

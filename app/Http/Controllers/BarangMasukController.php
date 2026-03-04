@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\PencatatanBarang;
 use App\Models\Supplier;
 use App\Models\Barang;
-use App\Models\Gudang; // Added this line
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -32,15 +31,8 @@ class BarangMasukController extends Controller
         $barang = Barang::orderBy('nama_barang')->get();
         
         $user = auth()->user();
-        $query = Gudang::where('is_active', true)->orderBy('nama_gudang');
-        
-        if (in_array($user->role, ['Staf Gudang Logistik', 'Gudang Logistik'])) {
-            $query->where('id', $user->gudang_id);
-        }
-        
-        $gudang = $query->get();
 
-        return view('masuk.form', compact('isEdit', 'suppliers', 'barang', 'gudang'));
+        return view('masuk.form', compact('isEdit', 'suppliers', 'barang'));
     }
 
     public function store(Request $request)
@@ -58,7 +50,6 @@ class BarangMasukController extends Controller
             'detail.*.keterangan' => ['nullable', 'string']
         ]);
         
-        $validated['gudang_id'] = 1;
         $maxId = PencatatanBarang::where('jenis', 'masuk')->max('id') ?? 0;
         $validated['kode'] = 'WH-IN/' . date('Ym').'/' . str_pad($maxId + 1, 4, '0', STR_PAD_LEFT);
         $validated['jenis'] = 'masuk';
@@ -76,8 +67,8 @@ class BarangMasukController extends Controller
 
                 // Update Stok Gudang
                 $stokGudang = \App\Models\StokGudang::firstOrCreate(
-                    ['gudang_id' => $validated['gudang_id'], 'barang_id' => $d['barang_id']],
-                    ['stok_tersedia' => 0]
+                    ['barang_id' => $d['barang_id']],
+                    ['stok_tersedia' => 0, 'baik' => 0, 'rusak_ringan' => 0, 'rusak_berat' => 0]
                 );
                 $stokGudang->increment('stok_tersedia', $d['jml']);
 
@@ -107,15 +98,8 @@ class BarangMasukController extends Controller
         $suppliers = Supplier::orderBy('nama_supplier')->get();
         
         $user = auth()->user();
-        $query = Gudang::where('is_active', true)->orderBy('nama_gudang');
-        
-        if (in_array($user->role, ['Staf Gudang Logistik', 'Gudang Logistik'])) {
-            $query->where('id', $user->gudang_id);
-        }
-        
-        $gudang = $query->get();
 
-        return view('masuk.form', compact('item', 'barang', 'suppliers', 'isEdit', 'gudang'));
+        return view('masuk.form', compact('item', 'barang', 'suppliers', 'isEdit'));
     }
 
     public function update(Request $request, $id)

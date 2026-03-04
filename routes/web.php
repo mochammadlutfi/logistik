@@ -12,8 +12,7 @@ use App\Http\Controllers\PemeliharaanBarangController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\GudangController;
-use App\Http\Controllers\TransferBarangController;
+use App\Http\Controllers\MonitoringBarangController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -56,13 +55,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('barang-masuk', BarangMasukController::class);
     Route::get('barang-keluar/{id}/export-pdf', [BarangKeluarController::class, 'exportPdf'])->name('barang-keluar.export-pdf');
     Route::resource('barang-keluar', BarangKeluarController::class);
+    Route::get('monitoring-barang/{id}/detail', [MonitoringBarangController::class, 'getDetail'])->name('monitoring-barang.detail');
+    Route::resource('monitoring-barang', MonitoringBarangController::class);
     Route::resource('pemeliharaan-barang', PemeliharaanBarangController::class);
     Route::put('pemeliharaan-barang/{id}/status', [PemeliharaanBarangController::class, 'status'])->name('pemeliharaan-barang.status');
     
-    // Multi-Gudang Routes
-    Route::resource('gudang', GudangController::class);
-    Route::resource('transfer-barang', TransferBarangController::class);
-    Route::put('transfer-barang/{transfer_barang}/status', [TransferBarangController::class, 'updateStatus'])->name('transfer-barang.updateStatus');
 
     // Laporan Routes
     Route::prefix('laporan')->name('laporan.')->group(function () {

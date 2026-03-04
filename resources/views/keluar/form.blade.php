@@ -465,6 +465,7 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
+            .then(res => res.json())
             .then(data => {
                 console.log('Permintaan detail data:', data);
                 if (data.success && data.data && data.data.detail) {
@@ -535,7 +536,7 @@
                         <input type="number" id="jml-${index}" class="w-full" name="detail[${index}][jml]" value="${detail.jml || 0}" min="0" />
                     </td>
                     <td class="px-6 py-4">
-                        <input type="text" id="kondisi-${index}" class="w-full" name="detail[${index}][kondisi]" value="${detail.kondisi || ''}" />
+                        <input type="text" id="kondisi-${index}" class="w-full" name="detail[${index}][kondisi]" value="${detail.kondisi || detail.keterangan || ''}" />
                     </td>
                     <td class="px-6 py-4" width="100px">
                         <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">

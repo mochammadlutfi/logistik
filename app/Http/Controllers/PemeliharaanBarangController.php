@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PemeliharaanBarang;
 use App\Models\Supplier;
 use App\Models\Barang;
-use App\Models\Gudang; // Added this line
+use App\Models\MonitoringBarang;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use PDO;
@@ -15,7 +15,7 @@ class PemeliharaanBarangController extends Controller
 {
     public function index(Request $request)
     {
-        $items = PemeliharaanBarang::with(['gudang', 'detail' => function($query){
+        $items = PemeliharaanBarang::with(['monitoring', 'detail' => function($query){
             $query->with(['barang']);
         }])
         ->orderByDesc('created_at')->get();
@@ -28,22 +28,53 @@ class PemeliharaanBarangController extends Controller
     {
         $isEdit = false;
         $barang = Barang::where('is_maintain', true)->orderBy('nama_barang')->get();
-        $gudang = Gudang::orderBy('nama_gudang')->get(); 
-        return view('pemeliharaan.form', compact('isEdit', 'barang', 'gudang'));
+        $monitoring = MonitoringBarang::orderByDesc('tanggal')->get();
+        return view('pemeliharaan.form', compact('isEdit', 'barang', 'monitoring'));
     }
 
     public function store(Request $request)
     {
         // dd($request->all());
-        $validated = $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'monitoring_id' => ['nullable', 'integer', 'exists:monitoring_barang,id'],
             'tanggal' => ['required'],
             'catatan' => ['nullable', 'string'],
             'biaya' => ['required', 'integer', 'min:0'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
-            'detail.*.jml' => ['nullable', 'integer', 'min:0'],
+            'detail.*.rusak_ringan' => ['nullable', 'integer', 'min:0'],
+            'detail.*.rusak_berat' => ['nullable', 'integer', 'min:0'],
             'detail.*.keterangan' => ['nullable', 'string']
         ]);
-        $validated['gudang_id'] =1;
+
+        $validator->after(function ($validator) use ($request) {
+            if ($request->monitoring_id && is_array($request->detail)) {
+                $monitoring = \App\Models\MonitoringBarang::with('detail')->find($request->monitoring_id);
+                if ($monitoring) {
+                    foreach ($request->detail as $index => $d) {
+                        if (isset($d['barang_id'])) {
+                            $monitoringDetail = $monitoring->detail->where('barang_id', $d['barang_id'])->first();
+                            if ($monitoringDetail) {
+                                $maxRg = $monitoringDetail->rusak_ringan;
+                                $maxRb = $monitoringDetail->rusak_berat;
+                                
+                                $inputRg = $d['rusak_ringan'] ?? 0;
+                                $inputRb = $d['rusak_berat'] ?? 0;
+
+                                if ($inputRg > $maxRg) {
+                                    $validator->errors()->add("detail.{$index}.rusak_ringan", "Maksimal {$maxRg} berdasarkan data monitoring.");
+                                }
+                                if ($inputRb > $maxRb) {
+                                    $validator->errors()->add("detail.{$index}.rusak_berat", "Maksimal {$maxRb} berdasarkan data monitoring.");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        $validated = $validator->validate();
+
         $maxId = PemeliharaanBarang::max('id') ?? 0;
         $validated['kode'] = 'MTN/' . date('Ym').'/' . str_pad($maxId + 1, 4, '0', STR_PAD_LEFT);
         $validated['petugas_id'] = auth()->user()->id;
@@ -54,7 +85,8 @@ class PemeliharaanBarangController extends Controller
             // dd($d);
             $data->detail()->create([
                 'barang_id' => $d['barang_id'],
-                'jml' => $d['jml'],
+                'rusak_ringan' => $d['rusak_ringan'],
+                'rusak_berat' => $d['rusak_berat'],
                 'keterangan' => $d['keterangan'],
             ]);
         }
@@ -62,38 +94,69 @@ class PemeliharaanBarangController extends Controller
     }
 
     public function show($id){
-        $item = PemeliharaanBarang::with(['detail' => function($q){
-            return $q->with(['barang']);
+        $item = PemeliharaanBarang::with(['monitoring', 'detail' => function($q){
+            return $q->with(['barang', 'barang.satuan']);
         }])->findOrFail($id);
         return view('pemeliharaan.show', compact('item'));
     }
 
     public function edit($id){
         $isEdit = true;
-        $item = PemeliharaanBarang::with(['detail' => function($q){
-            $q->with(['barang']);
+        $item = PemeliharaanBarang::with(['monitoring', 'detail' => function($q){
+            $q->with(['barang', 'barang.satuan']);
         }])->findOrFail($id);
         $barang = Barang::where('is_maintain', true)->orderBy('nama_barang')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
-        $gudang = Gudang::where('is_active', true)->orderBy('nama_gudang')->get();
+        $monitoring = MonitoringBarang::orderByDesc('tanggal')->get();
 
-        return view('pemeliharaan.form', compact('item', 'barang', 'suppliers', 'isEdit', 'gudang'));
+        return view('pemeliharaan.form', compact('item', 'barang', 'suppliers', 'isEdit', 'monitoring'));
     }
 
     public function update(Request $request, $id)
     {
         // dd($request->all());
         $barang = PemeliharaanBarang::findOrFail($id);
-        $validated = $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'monitoring_id' => ['nullable', 'integer', 'exists:monitoring_barang,id'],
             'tanggal' => ['required'],
             'alasan' => ['nullable'],
             'catatan' => ['nullable', 'string'],
-            'detail.*.id' => ['nullable', 'integer', 'exists:permintaan_barang_detail,id'],
+            'detail.*.id' => ['nullable', 'integer', 'exists:pemeliharaan_barang_detail,id'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
-            'detail.*.jml' => ['nullable', 'integer', 'min:0'],
+            'detail.*.rusak_ringan' => ['nullable', 'integer', 'min:0'],
+            'detail.*.rusak_berat' => ['nullable', 'integer', 'min:0'],
             'detail.*.keterangan' => ['nullable', 'string'],
             'detail_hapus' => ['nullable', 'string'],
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            if ($request->monitoring_id && is_array($request->detail)) {
+                $monitoring = \App\Models\MonitoringBarang::with('detail')->find($request->monitoring_id);
+                if ($monitoring) {
+                    foreach ($request->detail as $index => $d) {
+                        if (isset($d['barang_id'])) {
+                            $monitoringDetail = $monitoring->detail->where('barang_id', $d['barang_id'])->first();
+                            if ($monitoringDetail) {
+                                $maxRg = $monitoringDetail->rusak_ringan;
+                                $maxRb = $monitoringDetail->rusak_berat;
+                                
+                                $inputRg = $d['rusak_ringan'] ?? 0;
+                                $inputRb = $d['rusak_berat'] ?? 0;
+
+                                if ($inputRg > $maxRg) {
+                                    $validator->errors()->add("detail.{$index}.rusak_ringan", "Maksimal {$maxRg} berdasarkan data monitoring.");
+                                }
+                                if ($inputRb > $maxRb) {
+                                    $validator->errors()->add("detail.{$index}.rusak_berat", "Maksimal {$maxRb} berdasarkan data monitoring.");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        $validated = $validator->validate();
 
         $barang->update($validated);
 
@@ -103,7 +166,8 @@ class PemeliharaanBarangController extends Controller
                 'id' => $d['id'],
             ],[
                 'barang_id' => $d['barang_id'],
-                'jml' => $d['jml'],
+                'rusak_ringan' => $d['rusak_ringan'],
+                'rusak_berat' => $d['rusak_berat'],
                 'keterangan' => $d['keterangan'],
             ]);
         }
@@ -125,6 +189,7 @@ class PemeliharaanBarangController extends Controller
     public function status($id, Request $request)
     {
         $item = PemeliharaanBarang::findOrFail($id);
+        $oldStatus = $item->status;
         $item->status = $request->status;
 
         if (in_array($request->status, ['disetujui', 'ditolak'])) {
@@ -134,6 +199,26 @@ class PemeliharaanBarangController extends Controller
         }
 
         $item->save();
+
+        if ($request->status == 'selesai' && $oldStatus != 'selesai') {
+            foreach ($item->detail as $detail) {
+                $barangId = $detail->barang_id;
+                $rusakRingan = $detail->rusak_ringan ?? 0;
+                $rusakBerat = $detail->rusak_berat ?? 0;
+                $totalDiperbaiki = $rusakRingan + $rusakBerat;
+
+                if ($totalDiperbaiki > 0) {
+                    $stokGudang = \App\Models\StokGudang::where('barang_id', $barangId)->first();
+                    if ($stokGudang) {
+                        $stokGudang->baik += $totalDiperbaiki;
+                        $stokGudang->rusak_ringan = max(0, $stokGudang->rusak_ringan - $rusakRingan);
+                        $stokGudang->rusak_berat = max(0, $stokGudang->rusak_berat - $rusakBerat);
+                        $stokGudang->save();
+                    }
+                }
+            }
+        }
+
         return redirect()->route('pemeliharaan-barang.show', $id)->with('status', 'Status Pemeliharaan Barang berhasil diupdate');
     }
 }

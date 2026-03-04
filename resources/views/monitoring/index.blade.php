@@ -1,58 +1,37 @@
 <x-app-layout>
     <div class="p-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between gap-2 mb-6">
-            <h1 class="text-xl font-semibold">Transfer Barang</h1>
-            <a href="{{ route('transfer-barang.create') }}" class="btn btn-sm btn-primary">
+            <h1 class="text-xl font-semibold">Monitoring Barang</h1>
+            <a href="{{ route('monitoring-barang.create') }}" class="btn btn-sm btn-primary">
                 <i class="fas fa-plus"></i>
-                Tambah Transfer Barang
+                Tambah Monitoring
             </a>
         </div>
 
         @if (session('status'))
             <div class="mb-4 rounded border border-green-200 bg-green-50 text-green-700 px-3 py-2 text-sm">{{ session('status') }}</div>
         @endif
-        @if (session('error'))
-            <div class="mb-4 rounded border border-red-200 bg-red-50 text-red-700 px-3 py-2 text-sm">{{ session('error') }}</div>
-        @endif
 
         <div class="rounded-lg border p-4">
-            <table id="dt-transfer" class="min-w-full divide-y divide-gray-200">
+            <table id="dt-monitoring" class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asal</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tujuan</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Petugas</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Item</th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach ($items as $item)
                         <tr>
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $item->kode }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->tanggal->format('d/m/Y') }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->gudangAsal->nama_gudang }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->gudangTujuan->nama_gudang }}</td>
-                            <td class="px-4 py-3 text-sm">
-                                @php
-                                    $statusClass = match($item->status) {
-                                        'draft' => 'bg-gray-100 text-gray-700',
-                                        'dalam_pengiriman' => 'bg-blue-100 text-blue-700',
-                                        'diterima' => 'bg-green-100 text-green-700',
-                                        'dibatalkan' => 'bg-red-100 text-red-700',
-                                        default => 'bg-gray-100 text-gray-700',
-                                    };
-                                    $statusLabel = match($item->status) {
-                                        'draft' => 'Draft',
-                                        'dalam_pengiriman' => 'Dikirim',
-                                        'diterima' => 'Selesai',
-                                        'dibatalkan' => 'Batal',
-                                        default => $item->status,
-                                    };
-                                @endphp
-                                <span class="px-2 py-1 text-xs rounded {{ $statusClass }}">{{ $statusLabel }}</span>
-                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ $item->kode }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->lokasi }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->petugas?->name }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->detail()->count() }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700 text-right">
                                 <div id="action-dropdown-{{ $item->id }}" class="dropdown-menu">
                                     <button type="button" id="action-dropdown-{{ $item->id }}-trigger" aria-haspopup="menu" aria-controls="action-dropdown-{{ $item->id }}-menu" aria-expanded="false"
@@ -62,13 +41,13 @@
                                     <div id="action-dropdown-{{ $item->id }}-popover" data-popover aria-hidden="true" data-align="end" class="min-w-56">
                                         <div role="menu" id="action-dropdown-{{ $item->id }}-menu" aria-labelledby="action-dropdown-{{ $item->id }}-trigger">
                                         <div role="group" aria-labelledby="account-options">
-                                            <a role="menuitem" href="{{ route('transfer-barang.show', $item->id) }}">
+                                            <a role="menuitem" href="{{ route('monitoring-barang.show', $item->id) }}">
                                                 Detail
                                             </a>
-                                            <a role="menuitem" href="{{ route('transfer-barang.edit', $item->id) }}">
+                                            <a role="menuitem" href="{{ route('monitoring-barang.edit', $item->id) }}">
                                                 Ubah
                                             </a>
-                                            <form action="{{ route('transfer-barang.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transfer ini?');">
+                                            <form action="{{ route('monitoring-barang.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus form monitoring ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" role="menuitem">
@@ -93,10 +72,11 @@
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
-            $('#dt-transfer').DataTable({
+            $('#dt-monitoring').DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,
+                order: [],
                 pageLength: 10,
                 columnDefs: [ { orderable: false, targets: 5 } ],
                 language: {
@@ -106,14 +86,14 @@
                         <div class="mb-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-muted text-foreground flex size-10 shrink-0 items-center justify-center rounded-lg [&_svg:not([class*='size-'])]:size-6">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10.5 8 13l2 2.5" /><path d="m14 10.5 2 2.5-2 2.5" /><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z" /></svg>
                         </div>
-                        <h3 class="text-lg font-medium tracking-tight">Data Transfer Barang Tidak Tersedia</h3>
+                        <h3 class="text-lg font-medium tracking-tight">Data Monitoring Tidak Tersedia</h3>
                         <p class="text-muted-foreground [&>a:hover]:text-primary text-sm/relaxed [&>a]:underline [&>a]:underline-offset-4">
-                        Silakan tambahkan transfer barang baru.
+                        Silakan tambahkan form monitoring baru.
                         </p>
                     </header>
                     <section class="flex w-full max-w-sm min-w-0 flex-col items-center gap-4 text-sm text-balance">
                         <div class="flex gap-2">
-                            <a href="{{ route('transfer-barang.create') }}" class="btn btn-sm">
+                            <a href="{{ route('monitoring-barang.create') }}" class="btn btn-sm">
                                 <i class="fas fa-plus mr-2"></i>
                                 Tambah
                             </a>

@@ -36,7 +36,6 @@
                                         data-name="{{ $item->name }}"
                                         data-email="{{ $item->email }}"
                                         data-role="{{ $item->role }}"
-                                        data-gudang-id="{{ $item->gudang_id }}"
                                         onclick="openEditUser(this)">
                                         <i class="fas fa-edit mr-2"></i>
                                         Edit

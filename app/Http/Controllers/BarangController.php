@@ -57,7 +57,7 @@ class BarangController extends Controller
     }
 
     public function show($id){
-        $item = Barang::with(['kategori', 'satuan', 'gudang'])->findOrFail($id);
+        $item = Barang::with(['kategori', 'satuan', 'stokGudang'])->findOrFail($id);
         // dd($item->toArray());
         return view('master.barang.show', compact('item'));
     }

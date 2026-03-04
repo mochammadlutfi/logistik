@@ -14,8 +14,8 @@ class PemeliharaanBarangDetail extends Model
     protected $fillable = [
         'pemeliharaan_id',
         'barang_id',
-        'jml',
-        'kondisi',
+        'rusak_ringan',
+        'rusak_berat',
     ];
 
     public function barang()

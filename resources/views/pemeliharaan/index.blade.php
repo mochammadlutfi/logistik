@@ -17,12 +17,12 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gudang</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sumber Monitoring</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Biaya</th>
 
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Barang</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Rusak</th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -30,8 +30,16 @@
                     @foreach ($items as $item)
                         <tr>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ $item->kode }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-900">{{ $item->gudang->nama_gudang }}</td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                @if($item->monitoring_id)
+                                    <a href="{{ route('monitoring-barang.show', $item->monitoring_id) }}" class="text-blue-600 hover:underline">
+                                        {{ $item->monitoring->kode }}
+                                    </a>
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->biaya }}</td>
 
                             <td class="px-4 py-3 text-sm text-gray-700">
@@ -47,7 +55,9 @@
                                     <span class="bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Diproses</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->detail()->count() }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">
+                                {{ $item->detail()->sum('rusak_ringan') + $item->detail()->sum('rusak_berat') }} items
+                            </td>
                             <td class="px-4 py-3 text-sm text-gray-700 text-right">
                                 <div id="action-dropdown-{{ $item->id }}" class="dropdown-menu">
                                     <button type="button" id="action-dropdown-{{ $item->id }}-trigger" aria-haspopup="menu" aria-controls="action-dropdown-{{ $item->id }}-menu" aria-expanded="false"
@@ -92,6 +102,7 @@
                 paging: true,
                 searching: true,
                 ordering: true,
+                order: [],
                 pageLength: 10,
                 columnDefs: [ { orderable: false, targets: 3 } ],
                 language: {

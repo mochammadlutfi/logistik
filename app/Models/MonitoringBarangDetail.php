@@ -5,24 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class TransferBarangDetail extends Model
+class MonitoringBarangDetail extends Model
 {
     use HasFactory;
 
-    protected $table = 'transfer_barang_detail';
+    protected $table = 'monitoring_barang_detail';
 
     protected $fillable = [
-        'transfer_id',
+        'monitoring_id',
         'barang_id',
-        'jml_kirim',
-        'jml_diterima',
-        'kondisi',
-        'keterangan',
+        'baik',
+        'rusak_ringan',
+        'rusak_berat',
     ];
 
-    public function transfer()
+    public function monitoring()
     {
-        return $this->belongsTo(TransferBarang::class, 'transfer_id');
+        return $this->belongsTo(MonitoringBarang::class, 'monitoring_id');
     }
 
     public function barang()

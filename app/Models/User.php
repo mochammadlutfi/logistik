@@ -21,8 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
-        'gudang_id',
+        'phone_number',
     ];
 
     /**
@@ -46,11 +45,6 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function gudang()
-    {
-        return $this->belongsTo(Gudang::class, 'gudang_id');
     }
 
     protected function casts_removed(): array

@@ -2,7 +2,7 @@
     <div class="p-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between gap-2 mb-6">
             <h1 class="text-xl font-semibold">
-                Detail Barang Masuk
+                Detail Pemeliharaan Barang
             </h1>
 
             @if ($item->status == 'pending' && in_array(auth()->user()->role, ['Admin', 'Kabag Logistik']))
@@ -117,8 +117,16 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div class="space-y-1">
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Gudang</p>
-                        <p class="text-base font-semibold text-gray-900">{{ $item->gudang->nama_gudang }}</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Sumber Monitoring</p>
+                        <p class="text-base font-semibold text-gray-900">
+                            @if($item->monitoring_id)
+                                <a href="{{ route('monitoring-barang.show', $item->monitoring_id) }}" class="text-blue-600 hover:underline">
+                                    {{ $item->monitoring->kode }}
+                                </a>
+                            @else
+                                -
+                            @endif
+                        </p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tanggal</p>
@@ -179,7 +187,10 @@
                                     Satuan
                                 </th>
                                 <th scope="col" class="px-6 py-3 font-medium" width="140px">
-                                    Jumlah
+                                    Rusak Ringan
+                                </th>
+                                <th scope="col" class="px-6 py-3 font-medium" width="140px">
+                                    Rusak Berat
                                 </th>
                                 <th scope="col" class="px-6 py-3 font-medium">
                                     Catatan
@@ -196,7 +207,10 @@
                                         {{ $d->barang?->satuan?->nama_satuan ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4" width="140px">
-                                        {{ $d->jml ?? '0'}}
+                                        {{ $d->rusak_ringan ?? '0'}}
+                                    </td>
+                                    <td class="px-6 py-4" width="140px">
+                                        {{ $d->rusak_berat ?? '0'}}
                                     </td>
                                     <td class="px-6 py-4">
                                     {{ $d->keterangan  ?? '-'}}
