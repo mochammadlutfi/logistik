@@ -77,7 +77,7 @@ class BarangMasukController extends Controller
             }
         });
 
-        return redirect()->route('barang-masuk.index')->with('status', 'Barang berhasil dibuat');
+        return redirect()->route('barang-masuk.index')->with('status', 'Barang Masuk berhasil disimpan');
     }
 
     public function show($id){
@@ -137,14 +137,14 @@ class BarangMasukController extends Controller
             $barang->detail()->whereIn('id', explode(',', $validated['detail_hapus']))->delete();
         }
         
-        return redirect()->route('barang-masuk.index')->with('status', 'Barang berhasil diperbarui');
+        return redirect()->route('barang-masuk.index')->with('status', 'Barang Masuk berhasil diperbarui');
     }
 
     public function destroy($id)
     {
         $barang = PencatatanBarang::findOrFail($id);
         $barang->delete();
-        return redirect()->route('barang-masuk.index')->with('status', 'Barang berhasil dihapus');
+        return redirect()->route('barang-masuk.index')->with('status', 'Barang Masuk berhasil dihapus');
     }
 
     public function exportPdf($id)

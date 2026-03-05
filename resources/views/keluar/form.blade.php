@@ -138,8 +138,8 @@
                                                     value="{{ old('detail['.$k.'][jml]', $isEdit ? $d->jml : 0) }}" min="0" />
                                             </td>
                                             <td class="px-6 py-4">
-                                                <input type="text" id="kondisi-{{ $k }}" class="w-full" name="detail[{{ $k }}][kondisi]"
-                                                    value="{{ old('detail.'.$k.'.kondisi', $isEdit ? $d->kondisi : '') }}" />
+                                                <input type="text" id="catatan-{{ $k }}" class="w-full" name="detail[{{ $k }}][catatan]"
+                                                    value="{{ old('detail.'.$k.'.catatan', $isEdit ? $d->catatan : '') }}" />
                                             </td>
                                             <td class="px-6 py-4" width="100px">
                                                 <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
@@ -192,8 +192,8 @@
                                             value="{{ old('detail[0][jml]', $isEdit ? $item->jml : 0) }}" min="0" />
                                     </td>
                                     <td class="px-6 py-4">
-                                        <input type="text" id="kondisi-0" class="w-full" name="detail[0][kondisi]"
-                                            value="{{ old('detail.0.kondisi') }}" />
+                                        <input type="text" id="catatan-0" class="w-full" name="detail[0][catatan]"
+                                            value="{{ old('detail.0.catatan') }}" />
                                     </td>
                                     <td class="px-6 py-4" width="100px">
                                         <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
@@ -376,10 +376,10 @@
                     jumlah.id = `jml-${index}`;
                     jumlah.name = `detail[${index}][jml]`;
                 }
-                const kondisi = row.querySelector('input[type="text"][name^="detail"][name$="[kondisi]"]');
-                if (kondisi) {
-                    kondisi.id = `kondisi-${index}`;
-                    kondisi.name = `detail[${index}][kondisi]`;
+                const catatan = row.querySelector('input[type="text"][name^="detail"][name$="[catatan]"]');
+                if (catatan) {
+                    catatan.id = `catatan-${index}`;
+                    catatan.name = `detail[${index}][catatan]`;
                 }
                 const delBtn = row.querySelector('button.btn-destructive');
                 if (delBtn) delBtn.setAttribute('onclick', 'removeRow(this)');
@@ -390,13 +390,13 @@
         function resetRowValues(row) {
             const hidden = row.querySelector('input[type="hidden"][name$="[barang_id]"]');
             const jumlah = row.querySelector('input[type="number"][name$="[jml]"]');
-            const kondisi = row.querySelector('input[type="text"][name$="[kondisi]"]');
+            const catatan = row.querySelector('input[type="text"][name$="[catatan]"]');
             const idHidden = row.querySelector('input[type="hidden"][name$="[id]"]');
             const labelSpan = row.querySelector('.truncate');
             const satuanDisplay = row.querySelector('.satuan-display');
             if (hidden) hidden.value = '';
             if (jumlah) jumlah.value = 0;
-            if (kondisi) kondisi.value = '';
+            if (catatan) catatan.value = '';
             if (idHidden) idHidden.value = '';
             if (labelSpan) labelSpan.textContent = 'Pilih...';
             if (satuanDisplay) satuanDisplay.textContent = '-';
@@ -536,7 +536,7 @@
                         <input type="number" id="jml-${index}" class="w-full" name="detail[${index}][jml]" value="${detail.jml || 0}" min="0" />
                     </td>
                     <td class="px-6 py-4">
-                        <input type="text" id="kondisi-${index}" class="w-full" name="detail[${index}][kondisi]" value="${detail.kondisi || detail.keterangan || ''}" />
+                        <input type="text" id="catatan-${index}" class="w-full" name="detail[${index}][catatan]" value="${detail.catatan || detail.catatan || ''}" />
                     </td>
                     <td class="px-6 py-4" width="100px">
                         <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
