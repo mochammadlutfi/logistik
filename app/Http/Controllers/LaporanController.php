@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\PencatatanBarang;
 use App\Models\PermintaanBarang;
 use App\Models\PemeliharaanBarang;
+use App\Models\StokGudang;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
@@ -14,6 +15,7 @@ use App\Exports\BarangMasukExport;
 use App\Exports\BarangKeluarExport;
 use App\Exports\PermintaanBarangExport;
 use App\Exports\PemeliharaanBarangExport;
+use App\Exports\KerusakanBarangExport;
 
 class LaporanController extends Controller
 {
@@ -143,5 +145,24 @@ class LaporanController extends Controller
         }
 
         return Excel::download(new PemeliharaanBarangExport($data, $periode), 'laporan-pemeliharaan-barang-' . date('Y-m-d') . '.xlsx');
+    }
+
+    // Laporan Kerusakan Barang
+    public function kerusakanBarang(Request $request)
+    {
+        $data = StokGudang::with(['barang.kategori', 'barang.satuan'])
+            ->where(function($query) {
+                $query->where('rusak_ringan', '>', 0)
+                      ->orWhere('rusak_berat', '>', 0);
+            })
+            ->orderBy('barang_id')
+            ->get();
+
+        if ($request->format == 'pdf') {
+            $pdf = Pdf::loadView('laporan.pdf.kerusakan-barang', compact('data'));
+            return $pdf->download('laporan-kerusakan-barang-' . date('Y-m-d') . '.pdf');
+        }
+
+        return Excel::download(new KerusakanBarangExport($data), 'laporan-kerusakan-barang-' . date('Y-m-d') . '.xlsx');
     }
 }

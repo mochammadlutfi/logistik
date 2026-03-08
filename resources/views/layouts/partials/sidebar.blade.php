@@ -34,6 +34,7 @@
                     @endif
                     @if(in_array(auth()->user()->role, ['Gudang Logistik', 'Kabag Logistik']))
                     <li><a href="{{ url('/pemeliharaan-barang') }}"><i class="fa-solid fa-hand-holding-medical mr-2"></i><span>Pemeliharaan Barang</span></a></li>
+                    <li><a href="{{ url('/laporan-kerusakan') }}"><i class="fa-solid fa-clipboard-list mr-2"></i><span>Laporan Kerusakan</span></a></li>
                     <li><a href="{{ url('/monitoring-barang') }}"><i class="fa-solid fa-desktop mr-2"></i><span>Monitoring Barang</span></a></li>
                     @endif
                 </ul>

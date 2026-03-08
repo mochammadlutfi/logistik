@@ -19,7 +19,45 @@
                     @method('PUT')
                     @endif
                     <input type="hidden" name="detail_hapus" id="detail_hapus" value="" />
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="grid gap-3">
+                            <label for="permintaan_id">No Permintaan (Opsional)</label>
+                            <div id="select-permintaan" class="w-full select">
+                                <button type="button" class="btn-outline justify-between font-normal w-full" id="select-permintaan-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-permintaan-listbox">
+                                    <span class="truncate">{{ old('permintaan_id', $isEdit ? $item->permintaan_id : '') ? ($permintaan->where('id', old('permintaan_id', $isEdit ? $item->permintaan_id : ''))->first()->kode ?? 'Pilih...') : 'Pilih...' }}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0">
+                                    <path d="m7 15 5 5 5-5" />
+                                    <path d="m7 9 5-5 5 5" />
+                                    </svg>
+                                </button>
+                                <div id="select-permintaan-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
+                                    <header>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <path d="m21 21-4.3-4.3" />
+                                    </svg>
+                                    <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-permintaan-listbox" aria-labelledby="select-permintaan-trigger" />
+                                    </header>
+
+                                    <div role="listbox" id="select-permintaan-listbox" aria-orientation="vertical" aria-labelledby="select-permintaan-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
+                                    <div role="group" aria-labelledby="group-label-select-permintaan">
+                                        <div role="heading" id="group-label-select-permintaan">Permintaan Barang</div>
+                                        <div id="select-permintaan-option-0" role="option" data-value="" data-keywords="Kosongkan">
+                                            - Kosongkan -
+                                        </div>
+                                        @foreach ($permintaan as $b)
+                                        @php $isSelected = old('permintaan_id', $isEdit ? $item->permintaan_id : '') == $b->id; @endphp
+                                        <div id="select-permintaan-option-{{ $b->id }}" role="option" data-value="{{ $b->id }}" data-keywords="{{ $b->kode }}" {{ $isSelected ? 'aria-selected="true"' : '' }}>
+                                            {{ $b->kode }}
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="permintaan_id" value="{{ old('permintaan_id', $isEdit ? $item->permintaan_id : '') }}" />
+                            </div>
+                            @error('permintaan_id')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
+                        </div>
                         <div class="grid gap-3">
                             <label for="tanggal">Tanggal</label>
                             <input type="text" class="datepicker" id="tanggal" name="tanggal" value="{{ old('tanggal', $isEdit ? $item->tanggal : '') }}"
@@ -235,11 +273,13 @@
                 e.preventDefault();
                 const container = option.closest('.select');
                 const labelSpan = container.querySelector('.truncate');
-                const hiddenInput = container.querySelector('input[type="hidden"]');
-                
+                const hiddenInput = container.querySelector('input[type="hidden"][name$="[barang_id]"]');
+                const permintaanInput = container.querySelector('input[type="hidden"][name="permintaan_id"]');
+
                 if (labelSpan) labelSpan.textContent = option.textContent.trim();
                 if (hiddenInput) hiddenInput.value = option.dataset.value || '';
-                
+                if (permintaanInput) permintaanInput.value = option.dataset.value || '';
+
                 // Update satuan display
                 const row = container.closest('tr');
                 if (row) {
@@ -248,15 +288,15 @@
                         satuanDisplay.textContent = option.dataset.satuan || '-';
                     }
                 }
-                
+
                 // Update aria-selected
                 container.querySelectorAll('[role="option"][aria-selected="true"]').forEach(el => el.removeAttribute('aria-selected'));
                 option.setAttribute('aria-selected', 'true');
-                
+
                 // Close popover
                 const popover = container.querySelector('[id$="-popover"]');
                 if (popover) popover.setAttribute('aria-hidden', 'true');
-                
+
                 // Clear search input
                 const searchInput = popover?.querySelector('input[role="combobox"]');
                 if (searchInput) {
@@ -268,6 +308,11 @@
                             opt.style.display = '';
                         });
                     }
+                }
+
+                // Trigger fetch permintaan detail if permintaan_id is selected
+                if (permintaanInput && option.dataset.value) {
+                    fetchPermintaanDetail(option.dataset.value);
                 }
                 return;
             }
@@ -386,6 +431,100 @@
             }
             row.remove();
             reindexRows();
+        }
+
+        // Fetch permintaan detail and populate table
+        function fetchPermintaanDetail(permintaanId) {
+            if (!permintaanId) return;
+
+            fetch(`/permintaan-barang/${permintaanId}/detail`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Permintaan detail data:', data);
+                if (data.success && data.data && data.data.detail) {
+                    populateDetailTable(data.data.detail);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching permintaan detail:', error);
+            });
+        }
+
+        // Populate detail table with fetched data
+        function populateDetailTable(details) {
+            const tbody = document.querySelector('table tbody');
+            const barangData = @json($barang);
+
+            // Clear existing rows
+            tbody.innerHTML = '';
+
+            if (details.length === 0) {
+                addRow();
+                return;
+            }
+
+            details.forEach((detail, index) => {
+                const barangInfo = detail.barang;
+                const satuanNama = barangInfo && barangInfo.satuan ? barangInfo.satuan.nama_satuan : '';
+
+                const row = document.createElement('tr');
+                row.className = 'bg-neutral-primary border-b border-default';
+                row.innerHTML = `
+                    <td scope="row" class="px-6 py-4" width="40%">
+                        <div id="select-barang-${index}" class="w-full select">
+                            <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-${index}-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-${index}-listbox">
+                                <span class="truncate">${barangInfo ? barangInfo.nama_barang : 'Pilih...'}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down text-muted-foreground opacity-50 shrink-0">
+                                <path d="m7 15 5 5 5-5" />
+                                <path d="m7 9 5-5 5 5" />
+                                </svg>
+                            </button>
+                            <div id="select-barang-${index}-popover" data-popover aria-hidden="true" style="max-height: 320px; overflow: hidden;">
+                                <header>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="m21 21-4.3-4.3" />
+                                </svg>
+                                <input type="text" class="w-full border-0 focus:border-0" value="" placeholder="Search entries..." autocomplete="off" autocorrect="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="false" aria-controls="select-barang-${index}-listbox" aria-labelledby="select-barang-${index}-trigger" />
+                                </header>
+                                <div role="listbox" id="select-barang-${index}-listbox" aria-orientation="vertical" aria-labelledby="select-barang-${index}-trigger" class="scrollbar overflow-y-auto" style="max-height: 256px;">
+                                <div role="group" aria-labelledby="group-label-select-barang-${index}">
+                                    <div role="heading" id="group-label-select-barang-${index}">Barang</div>
+                                    ${barangData.map(b => `
+                                        <div id="select-barang-${index}-option-${b.id}" role="option" data-value="${b.id}" data-satuan="${b.satuan ? b.satuan.nama_satuan : ''}" ${detail.barang_id == b.id ? 'aria-selected="true"' : ''} data-keywords="${b.nama_barang}">
+                                            ${b.nama_barang}
+                                            <span class="text-xs text-muted-foreground">${b.satuan ? b.satuan.nama_satuan : ''}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="detail[${index}][barang_id]" value="${detail.barang_id}" />
+                        </div>
+                    </td>
+                    <td class="px-6 py-4" width="120px">
+                        <span class="satuan-display text-sm">${satuanNama || '-'}</span>
+                    </td>
+                    <td class="px-6 py-4" width="140px">
+                        <input type="number" id="jml-${index}" class="w-full" name="detail[${index}][jml]" value="${detail.jml || 0}" min="0" />
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="text" id="keterangan-${index}" class="w-full" name="detail[${index}][keterangan]" value="${detail.catatan || ''}" />
+                    </td>
+                    <td class="px-6 py-4" width="100px">
+                        <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
+                            <i class="fa-solid fa-close"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
         }
     </script>
     @endpush

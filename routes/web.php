@@ -9,6 +9,7 @@ use App\Http\Controllers\PermintaanBarangController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\PemeliharaanBarangController;
+use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
@@ -59,7 +60,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('monitoring-barang', MonitoringBarangController::class);
     Route::resource('pemeliharaan-barang', PemeliharaanBarangController::class);
     Route::put('pemeliharaan-barang/{id}/status', [PemeliharaanBarangController::class, 'status'])->name('pemeliharaan-barang.status');
-    
+
+    Route::resource('laporan-kerusakan', LaporanKerusakanController::class);
+    Route::put('laporan-kerusakan/{id}/status', [LaporanKerusakanController::class, 'updateStatus'])->name('laporan-kerusakan.updateStatus');
+    Route::get('laporan-kerusakan/{id}/pemeliharaan-detail', [LaporanKerusakanController::class, 'getPemeliharaanDetail'])->name('laporan-kerusakan.pemeliharaan-detail');
 
     // Laporan Routes
     Route::prefix('laporan')->name('laporan.')->group(function () {
@@ -69,6 +73,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/barang-keluar', [LaporanController::class, 'barangKeluar'])->name('barang-keluar');
         Route::get('/permintaan-barang', [LaporanController::class, 'permintaanBarang'])->name('permintaan-barang');
         Route::get('/pemeliharaan-barang', [LaporanController::class, 'pemeliharaanBarang'])->name('pemeliharaan-barang');
+        Route::get('/kerusakan-barang', [LaporanController::class, 'kerusakanBarang'])->name('kerusakan-barang');
     });
 });
 

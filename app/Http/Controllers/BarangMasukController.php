@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PencatatanBarang;
 use App\Models\Supplier;
 use App\Models\Barang;
+use App\Models\PermintaanBarang;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,7 +17,7 @@ class BarangMasukController extends Controller
     {
         $items = PencatatanBarang::with([ 'detail' => function($query){
             $query->with(['barang']);
-        }, 'supplier'])
+        }, 'supplier', 'permintaan'])
         ->where('jenis', 'masuk')
         ->orderByDesc('created_at')->get();
 
@@ -28,17 +29,19 @@ class BarangMasukController extends Controller
     {
         $isEdit = false;
         $suppliers = Supplier::orderBy('nama_supplier')->get();
-        $barang = Barang::orderBy('nama_barang')->get();
-        
+        $barang = Barang::with('satuan')->orderBy('nama_barang')->get();
+        $permintaan = PermintaanBarang::where('status', 'disetujui')->orderBy('id', 'DESC')->get();
+
         $user = auth()->user();
 
-        return view('masuk.form', compact('isEdit', 'suppliers', 'barang'));
+        return view('masuk.form', compact('isEdit', 'suppliers', 'barang', 'permintaan'));
     }
 
     public function store(Request $request)
     {
         // dd($request->all());
         $validated = $request->validate([
+            'permintaan_id' => ['nullable', 'integer', 'exists:permintaan_barang,id'],
             'tanggal' => ['required'],
             'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
             'sumber_barang' => ['nullable'],
@@ -81,7 +84,7 @@ class BarangMasukController extends Controller
     }
 
     public function show($id){
-        $item = PencatatanBarang::with(['supplier', 'detail' => function($q){
+        $item = PencatatanBarang::with(['supplier', 'permintaan', 'detail' => function($q){
             return $q->with(['barang']);
         }])->findOrFail($id);
         // dd($item->toArray());
@@ -91,15 +94,16 @@ class BarangMasukController extends Controller
 
     public function edit($id){
         $isEdit = true;
-        $item = PencatatanBarang::with(['supplier', 'detail' => function($q){
+        $item = PencatatanBarang::with(['supplier', 'permintaan', 'detail' => function($q){
             $q->with(['barang']);
         }])->findOrFail($id);
-        $barang = Barang::orderBy('nama_barang')->get();
+        $barang = Barang::with('satuan')->orderBy('nama_barang')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
-        
+        $permintaan = PermintaanBarang::orderBy('id', 'DESC')->get();
+
         $user = auth()->user();
 
-        return view('masuk.form', compact('item', 'barang', 'suppliers', 'isEdit'));
+        return view('masuk.form', compact('item', 'barang', 'suppliers', 'isEdit', 'permintaan'));
     }
 
     public function update(Request $request, $id)
@@ -107,6 +111,7 @@ class BarangMasukController extends Controller
         // dd($request->all());
         $barang = PencatatanBarang::findOrFail($id);
         $validated = $request->validate([
+            'permintaan_id' => ['nullable', 'integer', 'exists:permintaan_barang,id'],
             'tanggal' => ['required'],
             'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
             'sumber_barang' => ['nullable'],

@@ -17,6 +17,7 @@
                             <option value="barang-keluar">Laporan Barang Keluar</option>
                             <option value="permintaan-barang">Laporan Permintaan Barang</option>
                             <option value="pemeliharaan-barang">Laporan Pemeliharaan Barang</option>
+                            <option value="kerusakan-barang">Laporan Kerusakan Barang</option>
                         </select>
                     </div>
 
