@@ -64,7 +64,7 @@ class BarangKeluarController extends Controller
         $validated['jenis'] = 'keluar';
         $validated['user_id'] = auth()->user()->id;
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
+        $data = \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
             $data = PencatatanBarang::create($validated);
 
             foreach($validated['detail'] as $d){
@@ -104,6 +104,8 @@ class BarangKeluarController extends Controller
                     }
                 }
             }
+
+            return $data;
         });
 
         // Update status permintaan berdasarkan pemenuhan
