@@ -31,10 +31,17 @@
                     </div>
 
                     <div class="space-y-1">
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Supplier</p>
-                        <p class="text-base font-semibold text-gray-900">{{ $item->supplier->nama_supplier ?? '-' }}</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">No Permintaan</p>
+                        @if($item->permintaan)
+                            <p class="text-base font-semibold text-gray-900">
+                                <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                                    {{ $item->permintaan->kode }}
+                                </span>
+                            </p>
+                        @else
+                            <p class="text-base font-semibold text-gray-400">-</p>
+                        @endif
                     </div>
-
 
                     <div class="space-y-1">
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Sumber Barang</p>
@@ -44,6 +51,11 @@
                     <div class="space-y-1">
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tujuan Barang</p>
                         <p class="text-base font-semibold text-gray-900">{{ $item->tujuan_barang ?? '-' }}</p>
+                    </div>
+
+                    <div class="space-y-1">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Dibuat Oleh</p>
+                        <p class="text-base font-semibold text-gray-900">{{ $item->user->name ?? '-' }}</p>
                     </div>
                 </div>
 

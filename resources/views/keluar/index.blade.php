@@ -19,7 +19,7 @@
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No Permintaan</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sumber</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tujuan</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Barang</th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -30,7 +30,7 @@
                             <td class="px-4 py-3 text-sm text-gray-900">{{ $item->kode }}</td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ $item->permintaan->kode ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->sumber_barang }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ $item->tujuan_barang ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->detail()->count() }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700 text-right">
                                 <div id="action-dropdown-{{ $item->id }}" class="dropdown-menu">

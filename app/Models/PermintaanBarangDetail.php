@@ -15,6 +15,7 @@ class PermintaanBarangDetail extends Model
         'permintaan_id',
         'barang_id',
         'jml',
+        'jml_terpenuhi',
         'jml_approval',
         'catatan'
     ];
@@ -35,5 +36,17 @@ class PermintaanBarangDetail extends Model
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'barang_id');
+    }
+
+    // Helper untuk cek sisa yang belum terpenuhi
+    public function getSisaAttribute()
+    {
+        return $this->jml - ($this->jml_terpenuhi ?? 0);
+    }
+
+    // Helper untuk cek apakah sudah terpenuhi semua
+    public function getIsTerpenuhi()
+    {
+        return ($this->jml_terpenuhi ?? 0) >= $this->jml;
     }
 }

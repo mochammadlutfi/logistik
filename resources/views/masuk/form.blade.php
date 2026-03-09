@@ -19,7 +19,7 @@
                     @method('PUT')
                     @endif
                     <input type="hidden" name="detail_hapus" id="detail_hapus" value="" />
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div class="grid gap-3">
                             <label for="permintaan_id">No Permintaan (Opsional)</label>
                             <div id="select-permintaan" class="w-full select">
@@ -65,9 +65,22 @@
                             @error('tanggal')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
-                            <label for="tujuan_barang">Tujuan Barang</label>
-                            <input type="text" id="tujuan_barang" name="tujuan_barang" value="{{ old('tujuan_barang', $isEdit ? $item->tujuan_barang : '') }}" />
+                            <label for="sumber_barang">Sumber Barang</label>
+                            <input type="text" id="sumber_barang" name="sumber_barang" value="{{ old('sumber_barang', $isEdit ? $item->sumber_barang : '') }}" placeholder="Contoh: Supplier PT ABC" />
                         </div>
+                        <div class="grid gap-3">
+                            <label for="tujuan_barang">Tujuan Barang (Opsional)</label>
+                            <input type="text" id="tujuan_barang" name="tujuan_barang" value="{{ old('tujuan_barang', $isEdit ? $item->tujuan_barang : '') }}" placeholder="Contoh: Gudang Unit A" />
+                            <small class="text-xs text-gray-500">Digunakan untuk auto-fulfill permintaan</small>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-3" id="auto-fulfill-container" style="display: none;">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="auto_fulfill" id="auto_fulfill" value="1" {{ old('auto_fulfill') ? 'checked' : '' }} class="rounded border-gray-300 text-primary focus:ring-primary">
+                            <span class="text-sm font-medium">Langsung penuhi permintaan (otomatis buat Barang Keluar)</span>
+                        </label>
+                        <p class="text-xs text-muted-foreground">Jika dicentang, sistem akan otomatis membuat transaksi barang keluar untuk memenuhi permintaan setelah barang masuk.</p>
                     </div>
                     
 
@@ -98,6 +111,7 @@
                                         <tr class="bg-neutral-primary border-b border-default">
                                             <td scope="row" class="px-6 py-4" width="40%">
                                                 <input type="hidden" name="detail[{{ $k }}][id]" value="{{ $d->id }}" />
+                                                <input type="hidden" name="detail[{{ $k }}][permintaan_detail_id]" value="" />
                                                 <div id="select-barang-0" class="w-full select">
                                                     <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-0-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-0-listbox">
                                                         <span class="truncate">{{ old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : '') ? $barang->where('id', old('detail['.$k.'][barang_id]', $isEdit ? $d->barang_id : ''))->first()->nama_barang : 'Pilih...'  }}</span>
@@ -152,6 +166,7 @@
                                 @else
                                 <tr class="bg-neutral-primary border-b border-default">
                                     <td scope="row" class="px-6 py-4" width="40%">
+                                        <input type="hidden" name="detail[0][permintaan_detail_id]" value="" />
                                         <div id="select-barang-0" class="w-full select">
                                             <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-0-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-0-listbox">
                                                 <span class="truncate">{{ old('barang_id', $isEdit ? $item->barang_id : '') ? $barang->where('id', old('detail[0][barang_id]', $isEdit ? $item->barang_id : ''))->first()->nama_barang : 'Pilih...'  }}</span>
@@ -313,6 +328,12 @@
                 // Trigger fetch permintaan detail if permintaan_id is selected
                 if (permintaanInput && option.dataset.value) {
                     fetchPermintaanDetail(option.dataset.value);
+                    // Show auto fulfill checkbox
+                    document.getElementById('auto-fulfill-container').style.display = 'block';
+                } else if (permintaanInput) {
+                    // Hide auto fulfill checkbox if permintaan is cleared
+                    document.getElementById('auto-fulfill-container').style.display = 'none';
+                    document.getElementById('auto_fulfill').checked = false;
                 }
                 return;
             }
@@ -372,6 +393,8 @@
                 if (hidden) hidden.name = `detail[${index}][barang_id]`;
                 const idHidden = row.querySelector('input[type="hidden"][name^="detail"][name$="[id]"]');
                 if (idHidden) idHidden.name = `detail[${index}][id]`;
+                const permintaanDetailHidden = row.querySelector('input[type="hidden"][name^="detail"][name$="[permintaan_detail_id]"]');
+                if (permintaanDetailHidden) permintaanDetailHidden.name = `detail[${index}][permintaan_detail_id]`;
                 const jumlah = row.querySelector('input[type="number"][name^="detail"][name$="[jml]"]');
                 if (jumlah) {
                     jumlah.id = `jml-${index}`;
@@ -393,12 +416,14 @@
             const jumlah = row.querySelector('input[type="number"][name$="[jml]"]');
             const catatan = row.querySelector('input[type="text"][name$="[keterangan]"]');
             const idHidden = row.querySelector('input[type="hidden"][name$="[id]"]');
+            const permintaanDetailHidden = row.querySelector('input[type="hidden"][name$="[permintaan_detail_id]"]');
             const labelSpan = row.querySelector('.truncate');
             const satuanDisplay = row.querySelector('.satuan-display');
             if (hidden) hidden.value = '';
             if (jumlah) jumlah.value = 0;
             if (catatan) catatan.value = '';
             if (idHidden) idHidden.value = '';
+            if (permintaanDetailHidden) permintaanDetailHidden.value = '';
             if (labelSpan) labelSpan.textContent = 'Pilih...';
             if (satuanDisplay) satuanDisplay.textContent = '-';
         }
@@ -477,6 +502,7 @@
                 row.className = 'bg-neutral-primary border-b border-default';
                 row.innerHTML = `
                     <td scope="row" class="px-6 py-4" width="40%">
+                        <input type="hidden" name="detail[${index}][permintaan_detail_id]" value="${detail.id || ''}" />
                         <div id="select-barang-${index}" class="w-full select">
                             <button type="button" class="btn-outline justify-between font-normal w-full" id="select-barang-${index}-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="select-barang-${index}-listbox">
                                 <span class="truncate">${barangInfo ? barangInfo.nama_barang : 'Pilih...'}</span>
@@ -512,7 +538,7 @@
                         <span class="satuan-display text-sm">${satuanNama || '-'}</span>
                     </td>
                     <td class="px-6 py-4" width="140px">
-                        <input type="number" id="jml-${index}" class="w-full" name="detail[${index}][jml]" value="${detail.jml || 0}" min="0" />
+                        <input type="number" id="jml-${index}" class="w-full" name="detail[${index}][jml]" value="${detail.sisa !== undefined ? detail.sisa : (detail.jml || 0)}" min="0" />
                     </td>
                     <td class="px-6 py-4">
                         <input type="text" id="keterangan-${index}" class="w-full" name="detail[${index}][keterangan]" value="${detail.catatan || ''}" />

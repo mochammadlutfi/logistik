@@ -65,8 +65,8 @@
                             @error('tanggal')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid gap-3">
-                            <label for="sumber_barang">Sumber Barang</label>
-                            <input type="text" id="sumber_barang" name="sumber_barang" value="{{ old('sumber_barang', $isEdit ? $item->sumber_barang : '') }}" />
+                            <label for="tujuan_barang">Tujuan Barang</label>
+                            <input type="text" id="tujuan_barang" name="tujuan_barang" value="{{ old('tujuan_barang', $isEdit ? $item->tujuan_barang : '') }}" placeholder="Contoh: Gudang Unit A" />
                         </div>
                     </div>
                     
@@ -136,10 +136,11 @@
                                             <td class="px-6 py-4" width="140px">
                                                 <input type="number" id="jml-{{ $k }}" class="w-full" name="detail[{{ $k }}][jml]"
                                                     value="{{ old('detail['.$k.'][jml]', $isEdit ? $d->jml : 0) }}" min="0" />
+                                                <small class="text-xs text-gray-500 stok-info">Stok tersedia: -</small>
                                             </td>
                                             <td class="px-6 py-4">
                                                 <input type="text" id="catatan-{{ $k }}" class="w-full" name="detail[{{ $k }}][catatan]"
-                                                    value="{{ old('detail.'.$k.'.catatan', $isEdit ? $d->catatan : '') }}" />
+                                                    value="{{ old('detail.'.$k.'.catatan', $isEdit ? $d->catatan : '') }}" placeholder="Catatan" />
                                             </td>
                                             <td class="px-6 py-4" width="100px">
                                                 <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
@@ -190,10 +191,11 @@
                                     <td class="px-6 py-4" width="140px">
                                         <input type="number" id="jml-0" class="w-full" name="detail[0][jml]"
                                             value="{{ old('detail[0][jml]', $isEdit ? $item->jml : 0) }}" min="0" />
+                                        <small class="text-xs text-gray-500 stok-info">Stok tersedia: -</small>
                                     </td>
                                     <td class="px-6 py-4">
                                         <input type="text" id="catatan-0" class="w-full" name="detail[0][catatan]"
-                                            value="{{ old('detail.0.catatan') }}" />
+                                            value="{{ old('detail.0.catatan') }}" placeholder="Catatan" />
                                     </td>
                                     <td class="px-6 py-4" width="100px">
                                         <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
@@ -234,6 +236,21 @@
     </div>
     
     @push('scripts')
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.2s ease-out;
+        }
+    </style>
     <script>
         // Custom select handler yang bekerja dengan row dinamis
         // BasecoatUI CSS tetap digunakan, JavaScript custom untuk handle interaksi
@@ -285,6 +302,11 @@
                     const satuanDisplay = row.querySelector('.satuan-display');
                     if (satuanDisplay) {
                         satuanDisplay.textContent = option.dataset.satuan || '-';
+                    }
+
+                    // Fetch stok tersedia untuk barang yang dipilih
+                    if (hiddenInput && option.dataset.value) {
+                        fetchStokBarang(option.dataset.value, row);
                     }
                 }
 
@@ -369,6 +391,8 @@
                 }
                 const hidden = row.querySelector('input[type="hidden"][name^="detail"][name$="[barang_id]"]');
                 if (hidden) hidden.name = `detail[${index}][barang_id]`;
+                const permintaanDetId = row.querySelector('input[type="hidden"][name^="detail"][name$="[permintaan_detail_id]"]');
+                if (permintaanDetId) permintaanDetId.name = `detail[${index}][permintaan_detail_id]`;
                 const idHidden = row.querySelector('input[type="hidden"][name^="detail"][name$="[id]"]');
                 if (idHidden) idHidden.name = `detail[${index}][id]`;
                 const jumlah = row.querySelector('input[type="number"][name^="detail"][name$="[jml]"]');
@@ -392,12 +416,14 @@
             const jumlah = row.querySelector('input[type="number"][name$="[jml]"]');
             const catatan = row.querySelector('input[type="text"][name$="[catatan]"]');
             const idHidden = row.querySelector('input[type="hidden"][name$="[id]"]');
+            const permintaanDetailId = row.querySelector('input[type="hidden"][name$="[permintaan_detail_id]"]');
             const labelSpan = row.querySelector('.truncate');
             const satuanDisplay = row.querySelector('.satuan-display');
             if (hidden) hidden.value = '';
             if (jumlah) jumlah.value = 0;
             if (catatan) catatan.value = '';
             if (idHidden) idHidden.value = '';
+            if (permintaanDetailId) permintaanDetailId.remove();
             if (labelSpan) labelSpan.textContent = 'Pilih...';
             if (satuanDisplay) satuanDisplay.textContent = '-';
             
@@ -454,6 +480,145 @@
             reindexRows();
         }
 
+        // Fetch stok barang dari server
+        function fetchStokBarang(barangId, row) {
+            if (!barangId) return;
+
+            fetch(`/barang/${barangId}/stok`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const stokInfo = row.querySelector('.stok-info');
+                    const jmlInput = row.querySelector('input[type="number"][name$="[jml]"]');
+
+                    if (stokInfo) {
+                        stokInfo.textContent = `Stok tersedia: ${data.stok_tersedia}`;
+                        stokInfo.dataset.stokTersedia = data.stok_tersedia;
+                    }
+
+                    if (jmlInput) {
+                        const currentValue = parseInt(jmlInput.value) || 0;
+                        const stokTersedia = data.stok_tersedia;
+
+                        // Jika stok < jumlah yang diminta, isi dengan stok tersedia
+                        // Jika stok >= jumlah yang diminta, biarkan sesuai permintaan
+                        const newValue = Math.min(currentValue, stokTersedia);
+
+                        jmlInput.value = newValue;
+                        jmlInput.setAttribute('max', stokTersedia);
+                        jmlInput.dataset.stokTersedia = stokTersedia;
+
+                        // Trigger validasi realtime
+                        if (newValue > stokTersedia) {
+                            jmlInput.classList.add('border-red-500');
+                            if (stokInfo) {
+                                stokInfo.classList.add('text-red-500');
+                                stokInfo.classList.remove('text-gray-500');
+                            }
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching stok barang:', error);
+            });
+        }
+
+        // Validasi realtime saat input jumlah berubah
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('input[type="number"][name$="[jml]"]')) {
+                const jmlInput = e.target;
+                const row = jmlInput.closest('tr');
+                const stokInfo = row.querySelector('.stok-info');
+                const jml = parseInt(jmlInput.value) || 0;
+                const stokTersedia = parseInt(jmlInput.dataset.stokTersedia || stokInfo?.dataset.stokTersedia || 0);
+
+                if (jml > stokTersedia) {
+                    jmlInput.classList.add('border-red-500');
+                    if (stokInfo) {
+                        stokInfo.classList.add('text-red-500');
+                        stokInfo.classList.remove('text-gray-500');
+                    }
+                } else {
+                    jmlInput.classList.remove('border-red-500');
+                    if (stokInfo) {
+                        stokInfo.classList.remove('text-red-500');
+                        stokInfo.classList.add('text-gray-500');
+                    }
+                }
+            }
+        });
+
+        // Validasi form sebelum submit
+        function validateForm(e) {
+            console.log('Validating form...');
+
+            const rows = document.querySelectorAll('table tbody tr');
+            let hasError = false;
+            let errorMessages = [];
+            let hasValidItem = false;
+
+            console.log('Total rows:', rows.length);
+
+            rows.forEach((row, index) => {
+                const barangSelect = row.querySelector('input[type="hidden"][name$="[barang_id]"]');
+                const jmlInput = row.querySelector('input[type="number"][name$="[jml]"]');
+                const stokInfo = row.querySelector('.stok-info');
+
+                console.log(`Row ${index}:`, {
+                    barangId: barangSelect?.value,
+                    jml: jmlInput?.value,
+                    stokTersedia: jmlInput?.dataset.stokTersedia || stokInfo?.dataset.stokTersedia
+                });
+
+                // Skip row yang tidak ada barang dipilih
+                if (!barangSelect || !barangSelect.value) {
+                    return;
+                }
+
+                hasValidItem = true;
+                const jml = parseInt(jmlInput.value) || 0;
+                const stokTersedia = parseInt(jmlInput.dataset.stokTersedia || stokInfo?.dataset.stokTersedia || 0);
+                const barangNama = row.querySelector('.truncate')?.textContent.trim() || 'Barang';
+
+                if (jml <= 0) {
+                    hasError = true;
+                    errorMessages.push(`${barangNama}: Jumlah tidak boleh 0. Silakan hapus baris ini jika tidak diperlukan.`);
+                    jmlInput.classList.add('border-red-500');
+                } else if (jml > stokTersedia && stokTersedia > 0) {
+                    hasError = true;
+                    errorMessages.push(`${barangNama}: Jumlah (${jml}) melebihi stok tersedia (${stokTersedia})`);
+                    jmlInput.classList.add('border-red-500');
+                } else {
+                    jmlInput.classList.remove('border-red-500');
+                }
+            });
+
+            console.log('Validation result:', { hasValidItem, hasError, errorMessages });
+
+            // Cek apakah ada item yang valid
+            if (!hasValidItem) {
+                e.preventDefault();
+                showAlert('Validasi Form', 'Silakan pilih minimal 1 barang!', 'warning');
+                return false;
+            }
+
+            if (hasError) {
+                e.preventDefault();
+                showAlert('Validasi Form Gagal', errorMessages, 'error');
+                return false;
+            }
+
+            console.log('Validation passed!');
+            return true;
+        }
+
         // Fetch permintaan detail and populate table
         function fetchPermintaanDetail(permintaanId) {
             if (!permintaanId) return;
@@ -494,6 +659,10 @@
                 const barangInfo = detail.barang;
                 const satuanNama = barangInfo && barangInfo.satuan ? barangInfo.satuan.nama_satuan : '';
 
+                // Hitung sisa yang belum terpenuhi
+                const sisa = detail.sisa || (detail.jml - (detail.jml_terpenuhi || 0));
+                const sudahTerpenuhi = detail.jml_terpenuhi || 0;
+
                 const row = document.createElement('tr');
                 row.className = 'bg-neutral-primary border-b border-default';
                 row.innerHTML = `
@@ -527,16 +696,20 @@
                                 </div>
                             </div>
                             <input type="hidden" name="detail[${index}][barang_id]" value="${detail.barang_id}" />
+                            <input type="hidden" name="detail[${index}][permintaan_detail_id]" value="${detail.id}" />
                         </div>
                     </td>
                     <td class="px-6 py-4" width="120px">
                         <span class="satuan-display text-sm">${satuanNama || '-'}</span>
                     </td>
                     <td class="px-6 py-4" width="140px">
-                        <input type="number" id="jml-${index}" class="w-full" name="detail[${index}][jml]" value="${detail.jml || 0}" min="0" />
+                        <input type="number" id="jml-${index}" class="w-full" name="detail[${index}][jml]" value="${sisa}" min="0" max="${sisa}" />
+                        <small class="text-xs text-blue-600 block">Qty Permintaan: ${detail.jml}</small>
+                        ${sudahTerpenuhi > 0 ? `<small class="text-xs text-gray-500 block">Sudah terpenuhi: ${sudahTerpenuhi}</small>` : ''}
+                        <small class="text-xs text-gray-500 stok-info" data-stok-tersedia="0">Stok tersedia: Memuat...</small>
                     </td>
                     <td class="px-6 py-4">
-                        <input type="text" id="catatan-${index}" class="w-full" name="detail[${index}][catatan]" value="${detail.catatan || detail.catatan || ''}" />
+                        <input type="text" id="catatan-${index}" class="w-full" name="detail[${index}][catatan]" value="${detail.catatan || ''}" placeholder="Catatan" />
                     </td>
                     <td class="px-6 py-4" width="100px">
                         <button type="button" class="btn-destructive btn-sm" onclick="removeRow(this)">
@@ -545,8 +718,57 @@
                     </td>
                 `;
                 tbody.appendChild(row);
+
+                // Fetch stok tersedia untuk barang ini
+                if (detail.barang_id) {
+                    fetchStokBarang(detail.barang_id, row);
+                }
             });
         }
+        // Professional alert modal using SweetAlert2
+        function showAlert(title, messages, type = 'error') {
+            const messagesHtml = Array.isArray(messages) 
+                ? '<ul class="text-left list-disc list-inside space-y-1">' + messages.map(msg => `<li class="text-sm">${msg}</li>`).join('') + '</ul>'
+                : messages;
+
+            Swal.fire({
+                title: title,
+                html: messagesHtml,
+                icon: type,
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+        }
+
+        // Initialize immediately (script is already at the end of the page via push in Blade)
+        (function() {
+            console.log('Initializing form validation...');
+
+            // Attach form validation
+            const form = document.querySelector('form.form');
+            console.log('Form element found:', form);
+
+            if (form) {
+                console.log('Attaching submit event listener to form');
+                form.addEventListener('submit', validateForm);
+            } else {
+                console.error('Form not found! Available forms:', document.querySelectorAll('form'));
+            }
+
+            // Load stok untuk barang yang sudah ada (mode edit atau old input)
+            const rows = document.querySelectorAll('table tbody tr');
+            console.log('Found rows for stock loading:', rows.length);
+
+            rows.forEach(row => {
+                const barangInput = row.querySelector('input[type="hidden"][name$="[barang_id]"]');
+                if (barangInput && barangInput.value) {
+                    console.log('Loading stock for barang:', barangInput.value);
+                    fetchStokBarang(barangInput.value, row);
+                }
+            });
+        })();
     </script>
     @endpush
 

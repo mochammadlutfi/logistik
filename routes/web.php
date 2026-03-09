@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('barang-masuk/{id}/export-pdf', [BarangMasukController::class, 'exportPdf'])->name('barang-masuk.export-pdf');
     Route::resource('barang-masuk', BarangMasukController::class);
     Route::get('barang-keluar/{id}/export-pdf', [BarangKeluarController::class, 'exportPdf'])->name('barang-keluar.export-pdf');
+    Route::get('barang/{barangId}/stok', [BarangKeluarController::class, 'getStokBarang'])->name('barang.stok');
     Route::resource('barang-keluar', BarangKeluarController::class);
     Route::get('monitoring-barang/{id}/detail', [MonitoringBarangController::class, 'getDetail'])->name('monitoring-barang.detail');
     Route::resource('monitoring-barang', MonitoringBarangController::class);

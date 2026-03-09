@@ -139,6 +139,11 @@ class PermintaanBarangController extends Controller
             }]);
         }])->findOrFail($id);
 
+        // Tambahkan info sisa yang belum terpenuhi untuk setiap detail
+        $permintaan->detail->each(function($detail) {
+            $detail->sisa = $detail->jml - ($detail->jml_terpenuhi ?? 0);
+        });
+
         return response()->json([
             'success' => true,
             'data' => $permintaan

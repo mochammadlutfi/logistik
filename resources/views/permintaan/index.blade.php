@@ -37,8 +37,12 @@
                                     <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">Ditolak</span>
                                @elseif($item->status == 'selesai')
                                     <span class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">Selesai</span>
+                                @elseif($item->status == 'partial')
+                                    <span class="bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Sebagian</span>
                                 @elseif($item->status == 'diajukan')
                                     <span class="bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Diajukan</span>
+                                @else
+                                    <span class="bg-gray-500 text-white px-2 py-1 rounded text-xs font-semibold">{{ ucfirst($item->status) }}</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $item->detail()->count() }}</td>

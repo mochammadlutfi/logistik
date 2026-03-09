@@ -49,4 +49,44 @@ class PermintaanBarang extends Model
     {
         return $this->hasMany(PermintaanBarangDetail::class, 'permintaan_id');
     }
+
+    // Method untuk update status berdasarkan pemenuhan detail
+    public function updateStatusBerdasarkanPemenuhan()
+    {
+        $allDetails = $this->detail;
+
+        if ($allDetails->isEmpty()) {
+            return;
+        }
+
+        $allFulfilled = true;
+        $anyFulfilled = false;
+
+        foreach ($allDetails as $detail) {
+            $terpenuhi = $detail->jml_terpenuhi ?? 0;
+
+            if ($terpenuhi < $detail->jml) {
+                $allFulfilled = false;
+            }
+
+            if ($terpenuhi > 0) {
+                $anyFulfilled = true;
+            }
+        }
+
+        // Jika semua terpenuhi, status = selesai
+        if ($allFulfilled) {
+            $this->status = 'selesai';
+        }
+        // Jika ada yang terpenuhi tapi belum semua, status = partial
+        elseif ($anyFulfilled) {
+            $this->status = 'partial';
+        }
+        // Jika belum ada yang terpenuhi, tetap disetujui
+        else {
+            $this->status = 'disetujui';
+        }
+
+        $this->save();
+    }
 }

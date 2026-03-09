@@ -30,7 +30,8 @@ class BarangMasukController extends Controller
         $isEdit = false;
         $suppliers = Supplier::orderBy('nama_supplier')->get();
         $barang = Barang::with('satuan')->orderBy('nama_barang')->get();
-        $permintaan = PermintaanBarang::where('status', 'disetujui')->orderBy('id', 'DESC')->get();
+        // Tampilkan permintaan yang disetujui atau partial (belum selesai)
+        $permintaan = PermintaanBarang::whereIn('status', ['disetujui', 'partial'])->orderBy('id', 'DESC')->get();
 
         $user = auth()->user();
 
@@ -48,9 +49,12 @@ class BarangMasukController extends Controller
             'tujuan_barang' => ['nullable'],
             'stok_tersedia' => ['nullable', 'integer', 'min:0'],
             'catatan' => ['nullable', 'string'],
+            'auto_fulfill' => ['nullable', 'boolean'],
+            'detail' => ['required', 'array', 'min:1'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
             'detail.*.jml' => ['nullable', 'integer', 'min:0'],
-            'detail.*.keterangan' => ['nullable', 'string']
+            'detail.*.keterangan' => ['nullable', 'string'],
+            'detail.*.permintaan_detail_id' => ['nullable', 'integer', 'exists:permintaan_barang_detail,id']
         ]);
         
         $maxId = PencatatanBarang::where('jenis', 'masuk')->max('id') ?? 0;
@@ -58,8 +62,11 @@ class BarangMasukController extends Controller
         $validated['jenis'] = 'masuk';
         $validated['user_id'] = auth()->user()->id;
         
-        \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
+        $barangMasukId = null;
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated, &$barangMasukId) {
             $data = PencatatanBarang::create($validated);
+            $barangMasukId = $data->id;
 
             foreach($validated['detail'] as $d){
                 $data->detail()->create([
@@ -78,9 +85,19 @@ class BarangMasukController extends Controller
                 // Update Total Stok Barang
                 \App\Models\Barang::where('id', $d['barang_id'])->increment('stok_total', $d['jml']);
             }
+
+            // Auto-create Barang Keluar jika auto_fulfill dicentang dan ada permintaan_id
+            if (!empty($validated['auto_fulfill']) && !empty($validated['permintaan_id'])) {
+                $this->autoCreateBarangKeluar($validated, $data);
+            }
         });
 
-        return redirect()->route('barang-masuk.index')->with('status', 'Barang Masuk berhasil disimpan');
+        $message = 'Barang Masuk berhasil disimpan';
+        if (!empty($validated['auto_fulfill']) && !empty($validated['permintaan_id'])) {
+            $message .= ' dan Barang Keluar otomatis dibuat untuk memenuhi permintaan';
+        }
+
+        return redirect()->route('barang-masuk.index')->with('status', $message);
     }
 
     public function show($id){
@@ -163,5 +180,71 @@ class BarangMasukController extends Controller
 
         $filename = 'reservation-slip-' . str_replace('/', '-', $item->kode) . '.pdf';
         return $pdf->download($filename);
+    }
+
+    /**
+     * Auto-create Barang Keluar setelah Barang Masuk untuk memenuhi permintaan
+     */
+    private function autoCreateBarangKeluar($validated, $barangMasuk)
+    {
+        // Generate kode untuk barang keluar
+        $maxId = PencatatanBarang::where('jenis', 'keluar')->max('id') ?? 0;
+        $kodeBarangKeluar = 'WH-OUT/' . date('Ym').'/' . str_pad($maxId + 1, 4, '0', STR_PAD_LEFT);
+
+        // Buat transaksi barang keluar
+        $barangKeluar = PencatatanBarang::create([
+            'kode' => $kodeBarangKeluar,
+            'jenis' => 'keluar',
+            'permintaan_id' => $validated['permintaan_id'],
+            'tanggal' => $validated['tanggal'],
+            'tujuan_barang' => $validated['tujuan_barang'] ?? null,
+            'catatan' => 'Otomatis dibuat dari Barang Masuk: ' . $barangMasuk->kode,
+            'user_id' => auth()->user()->id,
+        ]);
+
+        // Proses setiap detail barang masuk
+        foreach($validated['detail'] as $d){
+            // Jika ada permintaan_detail_id, ambil sisa yang belum terpenuhi
+            if (!empty($d['permintaan_detail_id'])) {
+                $permintaanDetail = \App\Models\PermintaanBarangDetail::find($d['permintaan_detail_id']);
+
+                if ($permintaanDetail) {
+                    // Hitung sisa yang belum terpenuhi
+                    $sisaPermintaan = $permintaanDetail->jml - ($permintaanDetail->jml_terpenuhi ?? 0);
+
+                    // Tentukan jumlah yang akan dikeluarkan (maksimal sesuai sisa permintaan)
+                    $jmlKeluar = min($d['jml'], $sisaPermintaan);
+
+                    if ($jmlKeluar > 0) {
+                        // Simpan detail barang keluar
+                        $barangKeluar->detail()->create([
+                            'barang_id' => $d['barang_id'],
+                            'jml' => $jmlKeluar,
+                            'catatan' => 'Auto-fulfill dari Barang Masuk',
+                        ]);
+
+                        // Kurangi Stok Gudang
+                        $stokGudang = \App\Models\StokGudang::where('barang_id', $d['barang_id'])->first();
+                        if ($stokGudang) {
+                            $stokGudang->decrement('stok_tersedia', $jmlKeluar);
+                        }
+
+                        // Kurangi Total Stok Barang
+                        \App\Models\Barang::where('id', $d['barang_id'])->decrement('stok_total', $jmlKeluar);
+
+                        // Update jml_terpenuhi di permintaan_barang_detail
+                        $permintaanDetail->increment('jml_terpenuhi', $jmlKeluar);
+                    }
+                }
+            }
+        }
+
+        // Update status permintaan berdasarkan pemenuhan
+        if (!empty($validated['permintaan_id'])) {
+            $permintaan = PermintaanBarang::with('detail')->findOrFail($validated['permintaan_id']);
+            $permintaan->updateStatusBerdasarkanPemenuhan();
+        }
+
+        return $barangKeluar;
     }
 }

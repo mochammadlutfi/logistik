@@ -5,7 +5,7 @@
                 Detail Permintaan Barang
             </h1>
 
-            @if ($item->status == 'diajukan' && in_array(auth()->user()->role, ['Admin', 'Kabag Logistik']))
+            @if ($item->status == 'pending' && in_array(auth()->user()->role, ['Admin', 'Kabag Logistik']))
             <div class="flex gap-2">
                 <button type="button" onclick="document.getElementById('permintaan_setujui').showModal()" class="btn btn-primary">
                 <i class="fa-solid fa-check"></i>
@@ -108,6 +108,8 @@
                             <span class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">Selesai</span>
                         @elseif($item->status == 'diajukan')
                             <span class="bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Diajukan</span>
+                        @elseif($item->status == 'partial')
+                            <span class="bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Sebagian</span>
                         @endif
                     </div>
                     <div class="space-y-1">
@@ -140,6 +142,9 @@
                                     <th scope="col" class="px-6 py-3 font-medium" width="140px">
                                         Jumlah
                                     </th>
+                                    <th scope="col" class="px-6 py-3 font-medium" width="140px">
+                                        Terpenuhi
+                                    </th>
                                     <th scope="col" class="px-6 py-3 font-medium">
                                         Catatan
                                     </th>
@@ -156,6 +161,9 @@
                                         </td>
                                         <td class="px-6 py-4" width="140px">
                                             {{ $d->jml ?? '0'}}
+                                        </td>
+                                        <td class="px-6 py-4" width="140px">
+                                            {{ $d->jml_terpenuhi ?? '0'}}
                                         </td>
                                         <td class="px-6 py-4">
                                         {{ $d->keterangan  ?? '-'}}

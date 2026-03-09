@@ -32,22 +32,25 @@
 
                     <div class="space-y-1">
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">No Permintaan</p>
-                        <p class="text-base font-semibold text-gray-900">{{ $item->permintaan->kode ?? '-' }}</p>
-                    </div>
-
-                    <div class="space-y-1">
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Supplier</p>
-                        <p class="text-base font-semibold text-gray-900">{{ $item->supplier->nama_supplier ?? '-' }}</p>
-                    </div>
-
-                    <div class="space-y-1">
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Sumber Barang</p>
-                        <p class="text-base font-semibold text-gray-900">{{ $item->sumber_barang ?? '-' }}</p>
+                        @if($item->permintaan)
+                            <p class="text-base font-semibold text-gray-900">
+                                <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                                    {{ $item->permintaan->kode }}
+                                </span>
+                            </p>
+                        @else
+                            <p class="text-base font-semibold text-gray-400">-</p>
+                        @endif
                     </div>
 
                     <div class="space-y-1">
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tujuan Barang</p>
                         <p class="text-base font-semibold text-gray-900">{{ $item->tujuan_barang ?? '-' }}</p>
+                    </div>
+
+                    <div class="space-y-1">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Dibuat Oleh</p>
+                        <p class="text-base font-semibold text-gray-900">{{ $item->user->name ?? '-' }}</p>
                     </div>
                 </div>
 
@@ -66,7 +69,7 @@
                                         Jumlah
                                     </th>
                                     <th scope="col" class="px-6 py-3 font-medium">
-                                        Kondisi
+                                        Catatan
                                     </th>
                                 </tr>
                             </thead>
@@ -83,7 +86,7 @@
                                             {{ $d->jml ?? '0'}}
                                         </td>
                                         <td class="px-6 py-4">
-                                        {{ $d->kondisi  ?? '-'}}
+                                        {{ $d->catatan  ?? '-'}}
                                         </td>
                                     </tr>
                                 @endforeach

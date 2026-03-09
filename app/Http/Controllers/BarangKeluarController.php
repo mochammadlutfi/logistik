@@ -29,7 +29,8 @@ class BarangKeluarController extends Controller
     {
         $isEdit = false;
         $barang = Barang::with('satuan')->orderBy('nama_barang')->get();
-        $permintaan = PermintaanBarang::where('status', 'disetujui')->orderBy('id', 'DESC')->get();
+        // Tampilkan permintaan yang disetujui atau partial (belum selesai)
+        $permintaan = PermintaanBarang::whereIn('status', ['disetujui', 'partial'])->orderBy('id', 'DESC')->get();
         return view('keluar.form', compact('isEdit', 'permintaan', 'barang'));
     }
     
@@ -39,54 +40,77 @@ class BarangKeluarController extends Controller
         $validated = $request->validate([
             'permintaan_id' => ['required', 'integer', 'exists:permintaan_barang,id'],
             'tanggal' => ['required'],
-            'sumber_barang' => ['nullable'],
             'tujuan_barang' => ['nullable'],
             'stok_tersedia' => ['nullable', 'integer', 'min:0'],
             'catatan' => ['nullable', 'string'],
+            'detail' => ['required', 'array', 'min:1'],
+            'detail.*.permintaan_detail_id' => ['nullable', 'integer', 'exists:permintaan_barang_detail,id'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
-            'detail.*.jml' => ['nullable', 'integer', 'min:0'],
-            'detail.*.kondisi' => ['nullable', 'string']
+            'detail.*.jml' => ['required', 'integer', 'min:1'],
+            'detail.*.catatan' => ['nullable', 'string']
         ]);
-        
+
+        // Validasi tambahan untuk memastikan tidak ada qty 0
+        foreach($validated['detail'] as $index => $detail) {
+            if ($detail['jml'] <= 0) {
+                return back()->withErrors([
+                    "detail.{$index}.jml" => "Jumlah tidak boleh 0. Silakan hapus baris ini jika tidak diperlukan."
+                ])->withInput();
+            }
+        }
+
         $maxId = PencatatanBarang::where('jenis', 'keluar')->max('id') ?? 0;
         $validated['kode'] = 'WH-OUT/' . date('Ym').'/' . str_pad($maxId + 1, 4, '0', STR_PAD_LEFT);
         $validated['jenis'] = 'keluar';
         $validated['user_id'] = auth()->user()->id;
-        
+
         \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
             $data = PencatatanBarang::create($validated);
 
             foreach($validated['detail'] as $d){
-                // Check Stock Availability
-                $barang = \App\Models\Barang::find($d['barang_id']);
+                // Get stok tersedia dari StokGudang
+                $stokGudang = \App\Models\StokGudang::where('barang_id', $d['barang_id'])->first();
+                $stokTersedia = $stokGudang ? $stokGudang->stok_tersedia : 0;
 
-                if (!$barang || $barang->stok_total < $d['jml']) {
-                    $barangName = $barang->nama_barang ?? 'Unknown';
+                // Tentukan jumlah yang akan dikeluarkan (maksimal sesuai stok tersedia)
+                $jmlKeluar = min($d['jml'], $stokTersedia);
+
+                if ($jmlKeluar == 0) {
                     throw \Illuminate\Validation\ValidationException::withMessages([
-                        'detail' => "Stok tidak cukup untuk barang {$barangName}."
+                        'detail' => "Stok tidak tersedia untuk barang ID {$d['barang_id']}."
                     ]);
                 }
 
+                // Simpan detail barang keluar
                 $data->detail()->create([
                     'barang_id' => $d['barang_id'],
-                    'jml' => $d['jml'],
-                    'kondisi' => $d['kondisi'] ?? null,
+                    'jml' => $jmlKeluar,
+                    'catatan' => $d['catatan'] ?? null,
                 ]);
 
-                // Update Stok
-                $stokGudang = \App\Models\StokGudang::where('barang_id', $d['barang_id'])->first();
+                // Update Stok Gudang
                 if ($stokGudang) {
-                    $stokGudang->decrement('stok_tersedia', $d['jml']);
+                    $stokGudang->decrement('stok_tersedia', $jmlKeluar);
                 }
-                \App\Models\Barang::where('id', $d['barang_id'])->decrement('stok_total', $d['jml']);
+
+                // Update Total Stok Barang
+                \App\Models\Barang::where('id', $d['barang_id'])->decrement('stok_total', $jmlKeluar);
+
+                // Update jml_terpenuhi di permintaan_barang_detail
+                if (isset($d['permintaan_detail_id'])) {
+                    $permintaanDetail = \App\Models\PermintaanBarangDetail::find($d['permintaan_detail_id']);
+                    if ($permintaanDetail) {
+                        $permintaanDetail->increment('jml_terpenuhi', $jmlKeluar);
+                    }
+                }
             }
         });
 
-        $permintaan = PermintaanBarang::findOrFail($validated['permintaan_id']);
-        $permintaan->status = 'selesai';
-        $permintaan->save();
+        // Update status permintaan berdasarkan pemenuhan
+        $permintaan = PermintaanBarang::with('detail')->findOrFail($validated['permintaan_id']);
+        $permintaan->updateStatusBerdasarkanPemenuhan();
 
-        return redirect()->route('barang-keluar.index')->with('status', 'Barang Keluar berhasil disimpan');
+        return redirect()->route('barang-keluar.show', $data->id)->with('status', 'Barang Keluar berhasil disimpan');
     }
 
     public function show($id){
@@ -117,13 +141,13 @@ class BarangKeluarController extends Controller
         $validated = $request->validate([
             'tanggal' => ['required'],
             'permintaan_id' => ['required', 'integer', 'exists:permintaan_barang,id'],
-            'sumber_barang' => ['nullable'],
             'tujuan_barang' => ['nullable'],
             'catatan' => ['nullable', 'string'],
+            'detail' => ['required', 'array', 'min:1'],
             'detail.*.id' => ['nullable', 'integer', 'exists:pencatatan_barang_detail,id'],
             'detail.*.barang_id' => ['required', 'integer', 'exists:barang,id'],
             'detail.*.jml' => ['nullable', 'integer', 'min:0'],
-            'detail.*.kondisi' => ['nullable', 'string'],
+            'detail.*.catatan' => ['nullable', 'string'],
             'detail_hapus' => ['nullable', 'string'],
         ]);
 
@@ -136,7 +160,7 @@ class BarangKeluarController extends Controller
             ],[
                 'barang_id' => $d['barang_id'],
                 'jml' => $d['jml'],
-                'kondisi' => $d['kondisi'],
+                'catatan' => $d['catatan'],
             ]);
         }
         // dd($validated['detail_hapus']);
@@ -144,7 +168,7 @@ class BarangKeluarController extends Controller
             $barang->detail()->whereIn('id', explode(',', $validated['detail_hapus']))->delete();
         }
         
-        return redirect()->route('barang-keluar.index')->with('status', 'Barang Keluar berhasil diperbarui');
+        return redirect()->route('barang-keluar.show', $barang->id)->with('status', 'Barang Keluar berhasil diperbarui');
     }
 
     public function destroy($id)
@@ -165,5 +189,17 @@ class BarangKeluarController extends Controller
 
         $filename = 'surat-pengeluaran-' . str_replace('/', '-', $item->kode) . '.pdf';
         return $pdf->download($filename);
+    }
+
+    public function getStokBarang($barangId)
+    {
+        $stokGudang = \App\Models\StokGudang::where('barang_id', $barangId)->first();
+        $barang = \App\Models\Barang::find($barangId);
+
+        return response()->json([
+            'success' => true,
+            'stok_tersedia' => $stokGudang ? $stokGudang->stok_tersedia : 0,
+            'stok_total' => $barang ? $barang->stok_total : 0,
+        ]);
     }
 }

@@ -39,6 +39,7 @@
             const dataTable = new simpleDatatables.DataTable("#default-table");
         </script> --}}
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
             $(".datepicker").flatpickr({
                 altInput: true,
